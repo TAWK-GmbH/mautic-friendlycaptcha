@@ -6,14 +6,13 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticFriendlyCaptchaBundle\EventListener;
 
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\ValidationEvent;
 use Mautic\FormBundle\FormEvents;
-use Mautic\LeadBundle\Event\LeadEvent;
-use Mautic\LeadBundle\LeadEvents;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticFriendlyCaptchaBundle\Form\Type\FriendlyCaptchaType;
 use MauticPlugin\MauticFriendlyCaptchaBundle\Integration\FriendlyCaptchaIntegration;
@@ -22,68 +21,24 @@ use MauticPlugin\MauticFriendlyCaptchaBundle\Service\FriendlyCaptchaClient;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Translation\Translator;
 
 class FormSubscriber implements EventSubscriberInterface
 {
-    const MODEL_NAME_KEY_LEAD = 'lead.lead';
+    protected string $siteKey;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $eventDispatcher;
+    protected string $secretKey;
 
-    /**
-     * @var FriendlyCaptchaClient
-     */
-    protected $friendlyCaptchaClient;
-
-    /**
-     * @var string
-     */
-    protected $siteKey;
-
-    /**
-     * @var string
-     */
-    protected $secretKey;
-
-    /**
-     * @var boolean
-     */
     private $friendlyCaptchaClientIsConfigured = false;
 
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
+    private string $version;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var string|null
-     */
-    private $version;
-
-    /**
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param IntegrationHelper        $integrationHelper
-     * @param FriendlyCaptchaClient    $friendlyCaptchaClient
-     * @param LeadModel                $leadModel
-     * @param TranslatorInterface      $translator
-     */
     public function __construct(
-        EventDispatcherInterface $eventDispatcher,
-        IntegrationHelper $integrationHelper,
-        FriendlyCaptchaClient $client,
-        LeadModel $leadModel,
-        TranslatorInterface $translator
+        private EventDispatcherInterface $eventDispatcher,
+        private IntegrationHelper $integrationHelper,
+        private FriendlyCaptchaClient $friendlyCaptchaClient,
+        private Translator $translator
     ) {
-        $this->eventDispatcher = $eventDispatcher;
-        $this->friendlyCaptchaClient = $client;
         $integrationObject     = $integrationHelper->getIntegrationObject(FriendlyCaptchaIntegration::INTEGRATION_NAME);
         
         if ($integrationObject instanceof AbstractIntegration) {
@@ -96,26 +51,16 @@ class FormSubscriber implements EventSubscriberInterface
                 $this->friendlyCaptchaClientIsConfigured = true;
             }
         }
-        $this->leadModel = $leadModel;
-        $this->translator = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [
-            FormEvents::FORM_ON_BUILD         => ['onFormBuild', 0],
-            FriendlyCaptchaEvents::ON_FORM_VALIDATE => ['onFormValidate', 0],
+            FormEvents::FORM_ON_BUILD => ['onFormBuild', 0],
+            FriendlyCaptchaEvents::ON_FORM_CUSTOM_FIELD_VALIDATION => ['onFormValidateCustomField', 0],
         ];
     }
 
-    /**
-     * @param FormBuilderEvent $event
-     *
-     * @throws \Mautic\CoreBundle\Exception\BadConfigurationException
-     */
     public function onFormBuild(FormBuilderEvent $event)
     {
         if (!$this->friendlyCaptchaClientIsConfigured) {
@@ -125,7 +70,7 @@ class FormSubscriber implements EventSubscriberInterface
         $event->addFormField('plugin.friendlycaptcha', [
             'label'          => 'mautic.plugin.actions.friendlycaptcha',
             'formType'       => FriendlyCaptchaType::class,
-            'template'       => 'MauticFriendlyCaptchaBundle:Integration:friendlycaptcha.html.php',
+            'template'       => '@MauticFriendlyCaptcha/Field/friendlycaptcha.twig',
             'builderOptions' => [
                 'addShowLabel' => false,
                 'addLeadFieldList' => false,
@@ -138,15 +83,12 @@ class FormSubscriber implements EventSubscriberInterface
         ]);
 
         $event->addValidator('plugin.friendlycaptcha.validator', [
-            'eventName' => FriendlyCaptchaEvents::ON_FORM_VALIDATE,
+            'eventName' => FriendlyCaptchaEvents::ON_FORM_CUSTOM_FIELD_VALIDATION,
             'fieldType' => 'plugin.friendlycaptcha',
         ]);
     }
 
-    /**
-     * @param ValidationEvent $event
-     */
-    public function onFormValidate(ValidationEvent $event)
+    public function onFormValidateCustomField(ValidationEvent $event)
     {
         if (!$this->friendlyCaptchaClientIsConfigured) {
             return;
@@ -157,11 +99,5 @@ class FormSubscriber implements EventSubscriberInterface
         }
 
         $event->failedValidation($this->translator === null ? 'FriendlyCaptchaClient was not successful.' : $this->translator->trans('mautic.integration.friendlycaptcha.failure_message'));
-
-        $this->eventDispatcher->addListener(LeadEvents::LEAD_POST_SAVE, function (LeadEvent $event) {
-            if ($event->isNew()){
-                $this->leadModel->deleteEntity($event->getLead());
-            }
-        }, -255);
     }
 }

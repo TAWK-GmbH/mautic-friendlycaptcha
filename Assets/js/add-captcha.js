@@ -4,12 +4,6 @@ function addCaptcha(wrapper, inputName, siteKey) {
         startMode: 'auto',
         solutionFieldName: inputName
     });
-
-    const captchaInput = myCustomWidget.e.children[2];
-    if (captchaInput) {
-        console.log(captchaInput);
-        captchaInput.id = "mauticform_input_test_t";
-    }
 }
 /**
  * 

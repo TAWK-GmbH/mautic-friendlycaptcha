@@ -9,7 +9,6 @@
 namespace MauticPlugin\MauticFriendlyCaptchaBundle\Service;
 
 use GuzzleHttp\Client as GuzzleClient;
-use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticFriendlyCaptchaBundle\Integration\FriendlyCaptchaIntegration;
@@ -17,30 +16,15 @@ use Mautic\PluginBundle\Integration\AbstractIntegration;
 
 class FriendlyCaptchaClient
 {
+    protected string $siteKey;
 
-    /**
-     * @var string
-     */
-    protected $siteKey;
+    protected string $secretKey;
 
-    /**
-     * @var string
-     */
-    protected $secretKey;
-
-    /**
-     * @var string
-     */
-    protected $version;
+    protected string $version;
 
     protected $url;
 
-    /**
-     * FormSubscriber constructor.
-     *
-     * @param IntegrationHelper $integrationHelper
-     */
-    public function __construct(IntegrationHelper $integrationHelper)
+    public function __construct(private IntegrationHelper $integrationHelper)
     {
         $integrationObject = $integrationHelper->getIntegrationObject(FriendlyCaptchaIntegration::INTEGRATION_NAME);
 
@@ -55,22 +39,12 @@ class FriendlyCaptchaClient
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [];
     }
 
-
-    /**
-     * @param string $response
-     * @param Field  $field
-     *
-     * @return bool
-     */
-    public function verify($response)
+    public function verify(string $response)
     {
         $client   = new GuzzleClient(['timeout' => 10]);
         $response = $client->post(

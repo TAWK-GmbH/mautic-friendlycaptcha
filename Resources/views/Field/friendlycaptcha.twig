@@ -1,0 +1,50 @@
+{% set type = 'hidden' %}
+{% set required = true %}
+
+{% set js = getAssetUrl('plugins/MauticFriendlyCaptchaBundle/Assets/js/add-captcha.js', null, null, true)  %}
+{% set fcWidgetJs = getAssetUrl('plugins/MauticFriendlyCaptchaBundle/Assets/js/widget.js', null, null, true) %}
+{% set fcWidgetModuleJs = getAssetUrl('plugins/MauticFriendlyCaptchaBundle/Assets/js/widget.module.min.js', null, null, true) %}
+
+{% set formName = formName|default('')|replace({'_': ''}) %}
+{% set hashedFormName = md5(formName) %}
+{% set siteKey = field.customParameters.site_key %}
+
+{% set containerType = type|default('div-wrapper') %}
+{% set containerClass = containerClass|default(containerType) %}
+
+{% set containerAttributes = htmlAttributesStringToArray(field.containerAttributes|default('')) %}
+{% set containerAttributes = containerAttributes|merge({
+    'id': 'mauticform_' ~ formName ~ '_' ~ id,
+    'class': containerAttributes.class|default([])|merge([
+        'mauticform-row',
+        'mauticform-' ~ containerClass,
+        'mauticform-field-' ~ field.order|default(0),
+    ]),
+}) %}
+<div {{ _self.renderAttributes(containerAttributes) }}>
+    {% set captchaWrapperId = 'mauticform_' ~ formName ~ '_' ~ id ~ '_captcha' %}
+    <div id="{{ captchaWrapperId }}">
+        {% set inputName = 'mauticform[' ~ field.alias ~ ']' %}
+        <script src="{{ js }}"></script>
+        <script
+            type="module"
+            src="{{ fcWidgetModuleJs }}"
+            async
+            defer
+        ></script>
+        <script nomodule src="{{ fcWidgetJs }}" async defer></script>
+
+        <script type="text/javascript">
+            window.addEventListener('load', function() {
+                scheduleAddCaptcha('{{ captchaWrapperId }}', '{{ inputName }}', '{{ siteKey }}');
+            });
+        </script>
+    </div>
+    <span class="mauticform-errormsg" style="display: none;"></span>
+</div>
+
+{% macro renderAttributes(attributes) %}
+    {% for attrName, attrValue in attributes %}
+        {{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"
+    {% endfor %}
+{% endmacro %}

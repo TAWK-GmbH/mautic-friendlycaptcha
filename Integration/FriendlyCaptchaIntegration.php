@@ -10,7 +10,6 @@ namespace MauticPlugin\MauticFriendlyCaptchaBundle\Integration;
 
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 
 /**
@@ -18,7 +17,7 @@ use Symfony\Component\Form\FormBuilder;
  */
 class FriendlyCaptchaIntegration extends AbstractIntegration
 {
-    const INTEGRATION_NAME = 'FriendlyCaptcha';
+    public const INTEGRATION_NAME = 'FriendlyCaptcha';
 
     public function getName()
     {
@@ -43,12 +42,7 @@ class FriendlyCaptchaIntegration extends AbstractIntegration
         ];
     }
 
-    /**
-     * @param FormBuilder|Form $builder
-     * @param array            $data
-     * @param string           $formArea
-     */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(FormBuilder &$builder, array $data, string $formArea)
     {
         if ($formArea === 'keys') {
             $builder->add(

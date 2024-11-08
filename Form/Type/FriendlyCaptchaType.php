@@ -17,10 +17,6 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class FriendlyCaptchaType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -41,10 +37,7 @@ class FriendlyCaptchaType extends AbstractType
         }
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'friendlycaptcha';
     }

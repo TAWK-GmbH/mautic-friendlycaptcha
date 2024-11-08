@@ -10,5 +10,5 @@ namespace MauticPlugin\MauticFriendlyCaptchaBundle;
 
 final class FriendlyCaptchaEvents
 {
-    const ON_FORM_VALIDATE = 'mautic.plugin.friendlycaptcha.on_form_validate';
+    public const ON_FORM_CUSTOM_FIELD_VALIDATION = 'mautic.plugin.friendlycaptcha.on_form_custom_field_validation';
 }
