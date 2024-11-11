@@ -10,7 +10,7 @@ use MauticPlugin\MauticFriendlyCaptchaBundle\Integration\Config;
 use PHPUnit\Framework\TestCase;
 
 class ConfigTest extends TestCase
-{    
+{
     private $integrationObject;
     private $integrationHelper;
 
@@ -25,21 +25,22 @@ class ConfigTest extends TestCase
     {
         return [
             'empty array' => [
-                []
+                [],
             ],
             'empty secret key' => [
-                ['site_key' => 'a', 'secret_key' => '']
+                ['site_key' => 'a', 'secret_key' => ''],
             ],
             'empty site key' => [
-                ['site_key' => '', 'secret_key' => 'b']
-            ]
+                ['site_key' => '', 'secret_key' => 'b'],
+            ],
         ];
     }
 
     /**
      * @dataProvider getPluginNotConfiguredDataProvider
      */
-    public function testPluginNotConfigured(array $options) {
+    public function testPluginNotConfigured(array $options)
+    {
         $this->integrationObject
             ->method('getKeys')
             ->willReturn($options);
@@ -48,7 +49,8 @@ class ConfigTest extends TestCase
         $this->assertFalse($config->isConfigured());
     }
 
-    public function testDefault() {
+    public function testDefault()
+    {
         $this->integrationObject
             ->method('getKeys')
             ->willReturn([]);

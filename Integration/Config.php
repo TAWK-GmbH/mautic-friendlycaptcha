@@ -6,16 +6,15 @@ namespace MauticPlugin\MauticFriendlyCaptchaBundle\Integration;
 
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
-use MauticPlugin\MauticFriendlyCaptchaBundle\Integration\FriendlyCaptchaIntegration;
 
 class Config
 {
     public const FC_API_V1 = 'v1';
     public const FC_API_V2 = 'v2';
 
-    private string $siteKey = "";
+    private string $siteKey = '';
 
-    private string $secretKey = "";
+    private string $secretKey = '';
 
     private string $version = 'v1';
 
@@ -23,7 +22,7 @@ class Config
         private IntegrationHelper $integrationHelper,
     ) {
         $integrationObject = $integrationHelper->getIntegrationObject(FriendlyCaptchaIntegration::INTEGRATION_NAME);
-        
+
         if ($integrationObject instanceof AbstractIntegration) {
             $keys            = $integrationObject->getKeys();
             $this->siteKey   = isset($keys['site_key']) ? $keys['site_key'] : '';

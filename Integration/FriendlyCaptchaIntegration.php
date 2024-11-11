@@ -1,11 +1,5 @@
 <?php
 
-/*
- * @copyright   2024 Tax Academy Prof. Dr. Wolfgang Kessler GmbH. All rights reserved
- * @author      Daniel Band
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticFriendlyCaptchaBundle\Integration;
 
 use Mautic\PluginBundle\Integration\AbstractIntegration;
@@ -43,7 +37,7 @@ class FriendlyCaptchaIntegration extends AbstractIntegration
 
     public function appendToForm(&$builder, $data, $formArea): void
     {
-        if ($formArea === 'keys') {
+        if ('keys' === $formArea) {
             $builder->add(
                 'version',
                 ChoiceType::class,
@@ -59,7 +53,7 @@ class FriendlyCaptchaIntegration extends AbstractIntegration
                     ],
                     'required'    => false,
                     'placeholder' => false,
-                    'data'=> isset($data['version']) ? $data['version'] : 'v1'
+                    'data'        => isset($data['version']) ? $data['version'] : 'v1',
                 ]
             );
         }

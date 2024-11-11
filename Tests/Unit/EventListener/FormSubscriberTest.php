@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticFriendlyCaptchaBundle\Tests\Unit\EventListener;
 
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\ValidationEvent;
 use Mautic\FormBundle\FormEvents;
@@ -12,9 +13,8 @@ use MauticPlugin\MauticFriendlyCaptchaBundle\FriendlyCaptchaEvents;
 use MauticPlugin\MauticFriendlyCaptchaBundle\Integration\Config;
 use MauticPlugin\MauticFriendlyCaptchaBundle\Service\FriendlyCaptchaClient;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Mautic\CoreBundle\Translation\Translator;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class FormSubscriberTest extends TestCase
 {
@@ -29,11 +29,11 @@ class FormSubscriberTest extends TestCase
     protected function setUp(): void
     {
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->config = $this->createMock(Config::class);
-        $this->fcClient= $this->createMock(FriendlyCaptchaClient::class);
-        $this->translator = $this->createMock(Translator::class);
-        $this->logger = $this->createMock(LoggerInterface::class);
-        $this->formBuildEvent = new FormBuilderEvent($this->translator);
+        $this->config          = $this->createMock(Config::class);
+        $this->fcClient        = $this->createMock(FriendlyCaptchaClient::class);
+        $this->translator      = $this->createMock(Translator::class);
+        $this->logger          = $this->createMock(LoggerInterface::class);
+        $this->formBuildEvent  = new FormBuilderEvent($this->translator);
 
         $this->subscriber = new FormSubscriber(
             $this->eventDispatcher,
@@ -44,16 +44,16 @@ class FormSubscriberTest extends TestCase
         );
     }
 
-    public function testSubscribeEvents() 
+    public function testSubscribeEvents()
     {
         $events = $this->subscriber->getSubscribedEvents();
-        $this->assertEqualsCanonicalizing( [
-            FormEvents::FORM_ON_BUILD => ['onFormBuild', 0],
+        $this->assertEqualsCanonicalizing([
+            FormEvents::FORM_ON_BUILD                              => ['onFormBuild', 0],
             FriendlyCaptchaEvents::ON_FORM_CUSTOM_FIELD_VALIDATION => ['onFormValidateCustomField', 0],
         ], $events);
     }
 
-    public function testDontBuildFormOnConfigError() 
+    public function testDontBuildFormOnConfigError()
     {
         $this->config->method('isConfigured')->willReturn(false);
 
@@ -62,7 +62,7 @@ class FormSubscriberTest extends TestCase
         $this->subscriber->onFormBuild($this->formBuildEvent);
     }
 
-    public function testOnFormBuild() 
+    public function testOnFormBuild()
     {
         $this->config->method('isConfigured')->willReturn(true);
         $this->config->method('getVersion')->willReturn('a');
@@ -84,7 +84,7 @@ class FormSubscriberTest extends TestCase
         $this->assertEquals($validators['plugin.friendlycaptcha'], FriendlyCaptchaEvents::ON_FORM_CUSTOM_FIELD_VALIDATION);
     }
 
-    public function testDontValidateFormOnConfigError() 
+    public function testDontValidateFormOnConfigError()
     {
         $this->config->method('isConfigured')->willReturn(false);
         $this->logger->expects($this->once())->method(constraint: 'error');
@@ -96,11 +96,11 @@ class FormSubscriberTest extends TestCase
         $this->subscriber->onFormValidateCustomField($event);
     }
 
-    public function testOnFormValidateSuccess() 
+    public function testOnFormValidateSuccess()
     {
         $this->config->method('isConfigured')->willReturn(true);
 
-        $captchaResult = "atesttoken";
+        $captchaResult = 'atesttoken';
 
         $this->fcClient
             ->expects($this->once())
@@ -115,11 +115,11 @@ class FormSubscriberTest extends TestCase
         $this->subscriber->onFormValidateCustomField($event);
     }
 
-    public function testOnFormValidateFailure() 
+    public function testOnFormValidateFailure()
     {
         $this->config->method('isConfigured')->willReturn(true);
 
-        $captchaResult = "atesttoken";
+        $captchaResult = 'atesttoken';
 
         $this->fcClient
             ->expects($this->once())

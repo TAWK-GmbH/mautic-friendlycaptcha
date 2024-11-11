@@ -15,7 +15,7 @@ return [
     'description' => 'Enables Friendly Captcha integration.',
     'version'     => '1.0',
     'author'      => 'Daniel Band',
-    'services' => [
+    'services'    => [
         'integrations' => [
             'mautic.integration.friendlycaptcha' => [
                 'class'     => FriendlyCaptchaIntegration::class,

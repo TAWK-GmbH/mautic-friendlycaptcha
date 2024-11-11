@@ -10,17 +10,17 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticFriendlyCaptchaBundle\EventListener;
 
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\ValidationEvent;
 use Mautic\FormBundle\FormEvents;
-use MauticPlugin\MauticFriendlyCaptchaBundle\Integration\Config;
 use MauticPlugin\MauticFriendlyCaptchaBundle\Form\Type\FriendlyCaptchaType;
 use MauticPlugin\MauticFriendlyCaptchaBundle\FriendlyCaptchaEvents;
+use MauticPlugin\MauticFriendlyCaptchaBundle\Integration\Config;
 use MauticPlugin\MauticFriendlyCaptchaBundle\Service\FriendlyCaptchaClient;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Mautic\CoreBundle\Translation\Translator;
-use Psr\Log\LoggerInterface;
 
 class FormSubscriber implements EventSubscriberInterface
 {
@@ -32,12 +32,13 @@ class FormSubscriber implements EventSubscriberInterface
         private FriendlyCaptchaClient $friendlyCaptchaClient,
         private Translator $translator,
         private LoggerInterface $logger,
-    ) {}
+    ) {
+    }
 
     public static function getSubscribedEvents()
     {
         return [
-            FormEvents::FORM_ON_BUILD => ['onFormBuild', 0],
+            FormEvents::FORM_ON_BUILD                              => ['onFormBuild', 0],
             FriendlyCaptchaEvents::ON_FORM_CUSTOM_FIELD_VALIDATION => ['onFormValidateCustomField', 0],
         ];
     }
@@ -46,6 +47,7 @@ class FormSubscriber implements EventSubscriberInterface
     {
         if (!$this->config->isConfigured()) {
             $this->logger->error('FriendlyCaptcha: Please configure site_key and secret_key.');
+
             return;
         }
 
@@ -54,7 +56,7 @@ class FormSubscriber implements EventSubscriberInterface
             'formType'       => FriendlyCaptchaType::class,
             'template'       => '@MauticFriendlyCaptcha/Field/friendlycaptcha.twig',
             'builderOptions' => [
-                'addShowLabel' => false,
+                'addShowLabel'     => false,
                 'addLeadFieldList' => false,
                 'addIsRequired'    => false,
                 'addDefaultValue'  => false,
@@ -74,6 +76,7 @@ class FormSubscriber implements EventSubscriberInterface
     {
         if (!$this->config->isConfigured()) {
             $this->logger->error('FriendlyCaptcha: Please configure site_key and secret_key. Accept form submission anyways.');
+
             return;
         }
 
@@ -81,6 +84,6 @@ class FormSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $event->failedValidation($this->translator === null ? 'Captcha verification failed' : $this->translator->trans('mautic.integration.friendlycaptcha.failure_message'));
+        $event->failedValidation(null === $this->translator ? 'Captcha verification failed' : $this->translator->trans('mautic.integration.friendlycaptcha.failure_message'));
     }
 }
