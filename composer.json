@@ -2,14 +2,36 @@
     "name": "tawk/mautic-friendlycaptcha-bundle",
     "description": "This plugin brings Friendly Captcha integration to mautic.",
     "type": "mautic-plugin",
-    "require": {
-        "mautic/composer-plugin": "^1.0"
-    },
+    "version": "1.0.0",
     "license": "GPL-3.0-only",
     "authors": [
         {
             "name": "Daniel Band",
             "email": "daniel.band@tax-academy.de"
         }
-    ]
+    ],
+    "keywords": ["mautic", "plugin", "integration"],
+    "extra": {
+        "install-directory-name": "MauticFriendlyCaptcha"
+    },
+    "require": {
+         "mautic/core-lib": "^5.0"
+    },
+    "scripts": {
+        "test": [
+            "@phpunit",
+            "@csfixer"
+        ],
+        "quicktest": [
+            "@unit",
+            "@csfixer"
+        ],
+        "phpunit": "../../bin/phpunit -d memory_limit=1G  --bootstrap ../../vendor/autoload.php --configuration phpunit.xml --fail-on-warning --testsuite=all",
+        "unit": "../../bin/phpunit -d memory_limit=1G  --bootstrap ../../vendor/autoload.php --configuration phpunit.xml --fail-on-warning --testsuite=unit",
+        "functional": "../../bin/phpunit -d memory_limit=1G  --bootstrap ../../vendor/autoload.php --configuration phpunit.xml --fail-on-warning --testsuite=functional",
+        "coverage": "../../bin/phpunit -d memory_limit=1G  --bootstrap ../../vendor/autoload.php --configuration phpunit.xml --fail-on-warning --testsuite=all --coverage-text --coverage-html=Tests/Coverage",
+        "csfixer": "../../bin/php-cs-fixer fix . -v --dry-run --diff --using-cache=no --config=../../.php-cs-fixer.php",
+        "fixcs": "../../bin/php-cs-fixer fix . -v --using-cache=no --config=../../.php-cs-fixer.php",
+        "phpstan": "[ ! -f ../../var/cache/test/AppKernelTestDebugContainer.xml ] && (echo 'Building test cache ...'; APP_ENV=test APP_DEBUG=1 ../../bin/console > /dev/null 2>&1); php -d memory_limit=4G ../../bin/phpstan analyse ."
+    }
 }

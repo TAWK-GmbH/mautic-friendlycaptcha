@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- http://www.phpunit.de/manual/current/en/appendixes.configuration.html -->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.5/phpunit.xsd"
+         backupGlobals="false"
+         backupStaticAttributes="false"
+         colors="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         failOnRisky="true"
+         failOnWarning="true"
+         processIsolation="false"
+         stopOnFailure="false">
+
+    <coverage>
+        <include>
+            <directory>*</directory>
+        </include>
+        <exclude>
+            <directory>Assets</directory>
+            <directory>Config</directory>
+            <directory>DependencyInjection</directory>
+            <directory>Resources</directory>
+            <directory>Tests</directory>
+            <directory>Translations</directory>
+            <directory>vendor</directory>
+        </exclude>
+    </coverage>
+
+    <testsuites>
+        <testsuite name="unit">
+            <directory>Tests/Unit</directory>
+        </testsuite>
+        <!-- <testsuite name="functional">
+            <directory>Tests/Functional</directory>
+        </testsuite> -->
+        <testsuite name="all">
+            <directory>Tests/Unit</directory>
+            <!-- <directory>Tests/Functional</directory> -->
+        </testsuite>
+    </testsuites>
+
+    <php>
+        <env name="KERNEL_CLASS" value="AppTestKernel" />
+        <server name="KERNEL_DIR" value="app" />
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="weak" />
+    </php>
+
+    <listeners>
+        <listener class="\Symfony\Bridge\PhpUnit\SymfonyTestsListener" />
+        <listener class="\Mautic\CoreBundle\Test\Listeners\CleanupListener" />
+    </listeners>
+
+</phpunit>

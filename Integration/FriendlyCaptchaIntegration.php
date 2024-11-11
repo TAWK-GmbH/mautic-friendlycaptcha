@@ -10,7 +10,6 @@ namespace MauticPlugin\MauticFriendlyCaptchaBundle\Integration;
 
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\FormBuilder;
 
 /**
  * Class FriendlyCaptchaIntegration.
@@ -42,7 +41,7 @@ class FriendlyCaptchaIntegration extends AbstractIntegration
         ];
     }
 
-    public function appendToForm(FormBuilder &$builder, array $data, string $formArea)
+    public function appendToForm(&$builder, $data, $formArea): void
     {
         if ($formArea === 'keys') {
             $builder->add(

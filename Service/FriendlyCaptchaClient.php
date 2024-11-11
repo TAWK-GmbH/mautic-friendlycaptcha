@@ -8,63 +8,60 @@
 
 namespace MauticPlugin\MauticFriendlyCaptchaBundle\Service;
 
-use GuzzleHttp\Client as GuzzleClient;
-use Mautic\FormBundle\Entity\Field;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
-use MauticPlugin\MauticFriendlyCaptchaBundle\Integration\FriendlyCaptchaIntegration;
-use Mautic\PluginBundle\Integration\AbstractIntegration;
+use GuzzleHttp\Psr7\Request;
+use MauticPlugin\MauticFriendlyCaptchaBundle\Integration\Config;
+use Psr\Http\Client\ClientInterface;
+use Psr\Log\LoggerInterface;
 
 class FriendlyCaptchaClient
 {
-    protected string $siteKey;
+    public function __construct(
+        private ClientInterface $httpClient,
+        private LoggerInterface $logger,
+        private Config $config
+    ) {}
 
-    protected string $secretKey;
-
-    protected string $version;
-
-    protected $url;
-
-    public function __construct(private IntegrationHelper $integrationHelper)
+    public function verify(string $solution)
     {
-        $integrationObject = $integrationHelper->getIntegrationObject(FriendlyCaptchaIntegration::INTEGRATION_NAME);
-
-        if ($integrationObject instanceof AbstractIntegration) {
-            $keys            = $integrationObject->getKeys();
-            $this->siteKey   = isset($keys['site_key']) ? $keys['site_key'] : null;
-            $this->secretKey = isset($keys['secret_key']) ? $keys['secret_key'] : null;
-            $this->version = isset($keys['version']) ? $keys['version'] : 'v1';
-
-            if ($this->version == 'v1') $this->url = "https://api.friendlycaptcha.com/api/v1/siteverify";
-            if ($this->version == 'v2') $this->url = "https://global.frcapi.com/api/v2/captcha/siteverify";
+        if ($this->config->getVersion() === 'v1') {
+            return $this->verifyCaptcha('https://api.friendlycaptcha.com/api/v1/siteverify', $solution);
         }
+        return $this->verifyCaptcha('https://global.frcapi.com/api/v2/captcha/siteverify', $solution, true);
+
     }
-
-    public static function getSubscribedEvents()
+    
+    private function verifyCaptcha(string $url, string $solution, bool $useApiKeyHeader = false): bool
     {
-        return [];
-    }
+        if (empty($solution)) {
+            return false;
+        }
 
-    public function verify(string $response)
-    {
-        $client   = new GuzzleClient(['timeout' => 10]);
-        $response = $client->post(
-            $this->url,
-            [
-                'json' => [
-                    'solution' => $response,
-                    'secret'   => $this->secretKey,
-                    'sitekey' => $this->siteKey,
-                ],
-            ]
-        );
+        $headers = ['Content-Type' => 'application/json'];
+        $body = ['solution' => $solution, 'sitekey' => $this->config->getSiteKey()];
 
-        $response = json_decode($response->getBody(), true);
-        if (array_key_exists('success', $response) && $response['success'] === true) {
+        if ($useApiKeyHeader) {
+            $headers['X-API-Key'] = $this->config->getSecretKey();
+        } else {
+            $body['secret'] = $this->config->getSecretKey();
+        }
+
+        $request = new Request('POST', $url, $headers, json_encode($body));
+
+        try {
+            $response = $this->httpClient->sendRequest($request);
+            return $this->isValidResponse($response->getStatusCode(), $response->getBody());
+        } catch (\Exception $e) {
+            $this->logger->error('FriendlyCaptcha: Verification failed. Accept form submission anyways', ['exception' => $e]);
             return true;
         }
+    }
+    private function isValidResponse(int $statusCode, string $body): bool
+    {
+        if ($statusCode !== 200) {
+            throw new \Exception('Check if secret and solution are sent in the request body.');
+        }
 
-        //TODO send alerts or log alerts on failure?
-
-        return false;
+        $response = json_decode($body, true);
+        return !empty($response['success']) && $response['success'] === true;
     }
 }

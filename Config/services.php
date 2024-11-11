@@ -11,5 +11,4 @@ return function (ContainerConfigurator $configurator): void {
     $excludes = [];
 
     $services->load('MauticPlugin\\MauticFriendlyCaptchaBundle\\', '../')->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
-    $services->alias('mautic.integration.friendlycaptcha', \MauticPlugin\MauticFriendlyCaptchaBundle\Integration\FriendlyCaptchaIntegration::class);
 };
