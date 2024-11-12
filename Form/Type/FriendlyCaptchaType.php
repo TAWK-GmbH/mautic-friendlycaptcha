@@ -4,6 +4,7 @@ namespace MauticPlugin\MauticFriendlyCaptchaBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -14,25 +15,27 @@ class FriendlyCaptchaType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
-            'buttons',
-            FormButtonsType::class,
+            'mode',
+            ChoiceType::class,
             [
-                'apply_text'     => false,
-                'save_text'      => 'mautic.core.form.submit',
-                'cancel_onclick' => 'javascript:void(0);',
-                'cancel_attr'    => [
-                    'data-dismiss' => 'modal',
+                'label'      => 'mautic.friendlycaptcha.mode',
+                'label_attr' => ['class' => 'control-label'],
+                'attr' => [
+                    'class' => 'form-control',
+                    'tooltip' => 'mautic.friendlycaptcha.mode.tooltip',
                 ],
+                'choices' => [
+                    'mautic.friendlycaptcha.mode.auto' => 'auto',
+                    'mautic.friendlycaptcha.mode.focus' => 'focus',
+                    'mautic.friendlycaptcha.mode.none' => 'none'
+                ],
+                'data' => isset($options['data']['mode']) ? $options['data']['mode'] : 'focus',
             ]
         );
-
-        if (!empty($options['action'])) {
-            $builder->setAction($options['action']);
-        }
     }
 
     public function getBlockPrefix(): string
     {
-        return 'friendlycaptcha';
+        return 'formfield_friendlycaptcha';
     }
 }

@@ -1,8 +1,8 @@
-function addCaptcha(wrapper, inputName, siteKey, version) {
+function addCaptcha(wrapper, inputName, siteKey, version, mode) {
     if (version == 'v1') {
         const myCustomWidget = new friendlyChallenge.WidgetInstance(wrapper, {
             sitekey: siteKey,
-            startMode: 'auto',
+            startMode: mode,
             solutionFieldName: inputName
         });
 
@@ -12,7 +12,7 @@ function addCaptcha(wrapper, inputName, siteKey, version) {
     const myCustomWidget = frcaptcha.createWidget({
         element: wrapper,
         sitekey: siteKey,
-        startMode: 'focus',
+        startMode: mode,
         formFieldName: inputName
     });
 }
@@ -29,20 +29,20 @@ function checkPresenceOfFriendlyChallenge(version) {
  * @param {string} siteKey Friendly Captcha site key
  * @param {string} version Friendly Captcha api version
  */
-function scheduleAddCaptcha(wrapperId, inputName, siteKey, version) {
+function scheduleAddCaptcha(wrapperId, inputName, siteKey, version, mode) {
     const wrapper = document.querySelector(`#${wrapperId}`);
     if (!wrapper) {
         throw new Error(`No friendly captcha wrapper element found with id '${wrapperId}'`);
     }
 
     if (checkPresenceOfFriendlyChallenge(version)) {
-        addCaptcha(wrapper, inputName, siteKey, version)
+        addCaptcha(wrapper, inputName, siteKey, version, mode)
         return;
     }
 
     const timer = setInterval(function () {
         if (checkPresenceOfFriendlyChallenge(version)) {
-            addCaptcha(wrapper, inputName, siteKey, version);
+            addCaptcha(wrapper, inputName, siteKey, version, mode);
             clearInterval(timer);
         }    
         
