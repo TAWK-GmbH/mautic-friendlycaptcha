@@ -28,21 +28,31 @@
         'mauticform-field-' ~ field.order|default(0),
     ]),
 }) %}
-<div {{ _self.renderAttributes(containerAttributes) }}>
-    {% set captchaWrapperId = 'mauticform_' ~ formName ~ '_' ~ id ~ '_captcha' %}
-    <div id="{{ captchaWrapperId }}">
-        {% set inputName = 'mauticform[' ~ field.alias ~ ']' %}
-        <script src="{{ js }}"></script>
-        <script type="module" src="{{ fcWidgetModuleJs }}" async defer></script>
-        <script nomodule src="{{ fcWidgetJs }}" async defer></script>
 
-        <script type="text/javascript">
-            window.addEventListener('load', function() {
-                scheduleAddCaptcha('{{ captchaWrapperId }}', '{{ inputName }}', '{{ siteKey }}', '{{ version }}');
-            });
-        </script>
-    </div>
-    <span class="mauticform-errormsg" style="display: none;"></span>
+<div {{ _self.renderAttributes(containerAttributes) }} >
+    {% if inForm is defined and true == inForm %}
+        <label class="text-muted">{{ field.label|purify }}</label>
+    {% else %}
+        {% set captchaWrapperId = 'mauticform_' ~ formName ~ '_' ~ id ~ '_captcha' %}
+        <div id="{{ captchaWrapperId }}">
+            {% set inputName = 'mauticform[' ~ field.alias ~ ']' %}
+            <script src="{{ js }}"></script>
+            <script type="module" src="{{ fcWidgetModuleJs }}" async defer></script>
+            <script nomodule src="{{ fcWidgetJs }}" async defer></script>
+
+            <script type="text/javascript">
+                window.addEventListener('load', function() {
+                    scheduleAddCaptcha(
+                        '{{ captchaWrapperId }}', 
+                        '{{ inputName }}', 
+                        '{{ siteKey }}', 
+                        '{{ version }}'
+                    );
+                });
+            </script>
+        </div>
+        <span class="mauticform-errormsg" style="display: none;"></span>
+    {% endif %}
 </div>
 
 {% macro renderAttributes(attributes) %}
