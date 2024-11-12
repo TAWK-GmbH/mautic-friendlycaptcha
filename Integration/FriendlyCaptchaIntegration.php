@@ -22,6 +22,11 @@ class FriendlyCaptchaIntegration extends AbstractIntegration
         return 'Friendly Captcha';
     }
 
+    public function getIcon(): string
+    {
+        return 'plugins/MauticFriendlyCaptchaBundle/Assets/img/FriendlyCaptcha.svg';
+    }
+
     public function getAuthenticationType()
     {
         return 'none';
