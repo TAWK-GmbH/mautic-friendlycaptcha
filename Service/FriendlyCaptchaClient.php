@@ -16,28 +16,26 @@ class FriendlyCaptchaClient
     ) {
     }
 
-    public function verify(string $solution)
-    {
-        if ('v1' === $this->config->getVersion()) {
-            return $this->verifyCaptcha('https://api.friendlycaptcha.com/api/v1/siteverify', $solution);
-        }
-
-        return $this->verifyCaptcha('https://global.frcapi.com/api/v2/captcha/siteverify', $solution, true);
-    }
-
-    private function verifyCaptcha(string $url, string $solution, bool $useApiKeyHeader = false): bool
+    public function verify(string $solution): bool
     {
         if (empty($solution)) {
             return false;
         }
 
-        $headers = ['Content-Type' => 'application/json'];
-        $body    = ['solution' => $solution, 'sitekey' => $this->config->getSiteKey()];
+        $url = 'v1' == $this->config->getVersion()
+            ? 'https://api.friendlycaptcha.com/api/v1/siteverify'
+            : 'https://global.frcapi.com/api/v2/captcha/siteverify';
 
-        if ($useApiKeyHeader) {
-            $headers['X-API-Key'] = $this->config->getSecretKey();
-        } else {
+        $headers = ['Content-Type' => 'application/json'];
+
+        $body    = 'v1' == $this->config->getVersion()
+            ? ['solution' => $solution, 'sitekey' => $this->config->getSiteKey()]
+            : ['response' => $solution, 'sitekey' => $this->config->getSiteKey()];
+
+        if ('v1' == $this->config->getVersion()) {
             $body['secret'] = $this->config->getSecretKey();
+        } else {
+            $headers['X-API-Key'] = $this->config->getSecretKey();
         }
 
         $request = new Request('POST', $url, $headers, json_encode($body));

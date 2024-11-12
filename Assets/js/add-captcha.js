@@ -9,13 +9,18 @@ function addCaptcha(wrapper, inputName, siteKey, version) {
         return;
     } 
 
-    const myCustomWidget = new frcaptcha.createWidget({
+    const myCustomWidget = frcaptcha.createWidget({
         element: wrapper,
         sitekey: siteKey,
-        startMode: 'auto',
-        solutionFieldName: inputName
+        startMode: 'focus',
+        formFieldName: inputName
     });
 }
+
+function checkPresenceOfFriendlyChallenge(version) {
+    return 'v1' == version && friendlyChallenge || 'v2' == version && frcaptcha;
+}
+
 /**
  * 
  * @param {string} wrapperId Friendly Captcha form wrapper id
@@ -30,13 +35,13 @@ function scheduleAddCaptcha(wrapperId, inputName, siteKey, version) {
         throw new Error(`No friendly captcha wrapper element found with id '${wrapperId}'`);
     }
 
-    if (friendlyChallenge) {
+    if (checkPresenceOfFriendlyChallenge(version)) {
         addCaptcha(wrapper, inputName, siteKey, version)
         return;
     }
 
     const timer = setInterval(function () {
-        if (friendlyChallenge) {
+        if (checkPresenceOfFriendlyChallenge(version)) {
             addCaptcha(wrapper, inputName, siteKey, version);
             clearInterval(timer);
         }    

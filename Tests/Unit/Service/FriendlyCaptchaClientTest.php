@@ -88,7 +88,7 @@ class FriendlyCaptchaClientTest extends TestCase
             'https://global.frcapi.com/api/v2/captcha/siteverify',
             ['Content-Type' => ['application/json'], 'X-API-Key' => [$this->config->getSecretKey()]],
             json_encode([
-                'solution' => FriendlyCaptchaClientTest::CAPTCHA_TOKEN,
+                'response' => FriendlyCaptchaClientTest::CAPTCHA_TOKEN,
                 'sitekey'  => $this->config->getSiteKey(),
             ])
         );
