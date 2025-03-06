@@ -33,7 +33,7 @@ $formButtons = (!empty($inForm)) ? $view->render(
 ) : '';
 
 if($field['customParameters']['version'] == 'v1') {
-$jsElement .= <<<JSELEMENT
+    $jsElement .= <<<JSELEMENT
 <script
   type="module"
   src="$fcWidgetModuleJs"
@@ -46,16 +46,29 @@ JSELEMENT;
     $jsElement = "<script>not implemented</script>";
 }
 
-$html = <<<HTML
-    {$jsElement}
-    <script src="{$js}"></script>
-    <script type="text/javascript">
-        window.addEventListener('load', function() {
-            scheduleAddCaptcha('{$wrapperId}', '{$inputName}', '{$siteKey}');
-        });
-    </script>
-	<div $containerAttr>
+// Ensure necessary variables are defined to prevent errors
+$inBuilder = $inBuilder ?? false;
+$jsElement = $jsElement ?? '';
+
+// Only add JavaScript when NOT in the form builder
+if (!$inBuilder) {
+    $html = <<<HTML
+        {$jsElement}
+        <script src="{$js}"></script>
+        <script type="text/javascript">
+          window.setTimeout(function() {
+                scheduleAddCaptcha('{$wrapperId}', '{$inputName}', '{$siteKey}');
+          }, 2000);
+        </script>
+        <div $containerAttr>
 HTML;
+} else {
+    $html = <<<HTML
+        <div $containerAttr>
+HTML;
+}
+
+
 
 $html .= <<<HTML
         <span class="mauticform-errormsg" style="display: none;"></span>
