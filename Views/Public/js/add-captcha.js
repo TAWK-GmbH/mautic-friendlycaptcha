@@ -1,7 +1,7 @@
 function addCaptcha(wrapper, inputName, siteKey) {
     const myCustomWidget = new friendlyChallenge.WidgetInstance(wrapper, {
         sitekey: siteKey,
-        startMode: 'auto',
+        startMode: 'focus',
         solutionFieldName: inputName
     });
 
