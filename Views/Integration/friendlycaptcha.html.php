@@ -1,7 +1,8 @@
+<?php $jsElement = $jsElement ?? ''; ?>
 <?php
 
 $js = $view['assets']->getUrl('plugins/MauticFriendlyCaptchaBundle/Views/Public/js/add-captcha.js', null, null, true);
-$fcWidgetJs = $view['assets']->getUrl('plugins/MauticFriendlyCaptchaBundle/Views/Public/js/widget.js', null, null, true);
+$fcWidgetJs = $view['assets']->getUrl('plugins/MauticFriendlyCaptchaBundle/Views/Public/js/widget.min.js', null, null, true);
 $fcWidgetModuleJs = $view['assets']->getUrl('plugins/MauticFriendlyCaptchaBundle/Views/Public/js/widget.module.min.js', null, null, true);
 $siteKey   = $field['customParameters']['site_key'];
 
