@@ -1,6 +1,7 @@
 {% set type = 'hidden' %}
 {% set required = true %}
 
+
 {% set js = getAssetUrl('plugins/MauticFriendlyCaptchaBundle/Assets/js/add-captcha.js', null, null, true)  %}
 
 {% set version = field.customParameters.version %}
@@ -41,15 +42,15 @@
             <script nomodule src="{{ fcWidgetJs }}" async defer></script>
 
             <script type="text/javascript">
-                window.addEventListener('load', function() {
+                window.setTimeout(function() {
                     scheduleAddCaptcha(
-                        '{{ captchaWrapperId }}', 
-                        '{{ inputName }}', 
-                        '{{ siteKey }}', 
+                        '{{ captchaWrapperId }}',
+                        '{{ inputName }}',
+                        '{{ siteKey }}',
                         '{{ version }}',
                         '{{ field.properties.mode }}'
                     );
-                });
+                }, 2000);
             </script>
         </div>
         <span class="mauticform-errormsg" style="display: none;"></span>
