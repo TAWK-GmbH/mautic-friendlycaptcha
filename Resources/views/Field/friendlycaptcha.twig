@@ -22,7 +22,7 @@
 
 {% set containerAttributes = htmlAttributesStringToArray(field.containerAttributes|default('')) %}
 {% set containerAttributes = containerAttributes|merge({
-    'id': 'mauticform_' ~ formName ~ '_' ~ id,
+    'id': 'mauticform' ~ formName ~ '_' ~ id,
     'class': containerAttributes.class|default([])|merge([
         'mauticform-row',
         'mauticform-' ~ containerClass,
