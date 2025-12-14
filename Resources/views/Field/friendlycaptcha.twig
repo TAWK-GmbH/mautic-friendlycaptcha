@@ -6,7 +6,7 @@
 
 {% set version = field.customParameters.version %}
 {% if version == 'v1' %}
-    {% set fcWidgetJs = getAssetUrl('plugins/MauticFriendlyCaptchaBundle/Assets/js/v1/widget.js', null, null, true) %}
+    {% set fcWidgetJs = getAssetUrl('plugins/MauticFriendlyCaptchaBundle/Assets/js/v1/widget.min.js', null, null, true) %}
     {% set fcWidgetModuleJs = getAssetUrl('plugins/MauticFriendlyCaptchaBundle/Assets/js/v1/widget.module.min.js', null, null, true) %}
 {% else %}
     {% set fcWidgetJs = getAssetUrl('plugins/MauticFriendlyCaptchaBundle/Assets/js/v2/site.compat.min.js', null, null, true) %}
