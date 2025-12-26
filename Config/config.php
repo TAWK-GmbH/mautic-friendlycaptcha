@@ -13,7 +13,7 @@ use MauticPlugin\MauticFriendlyCaptchaBundle\Integration\FriendlyCaptchaIntegrat
 return [
     'name'        => 'Friendly Captcha',
     'description' => 'Enables Friendly Captcha integration.',
-    'version'     => '1.0',
+    'version'     => '1.2.0',
     'author'      => 'Daniel Band',
     'services'    => [
         'integrations' => [
