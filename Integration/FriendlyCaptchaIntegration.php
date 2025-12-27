@@ -61,6 +61,45 @@ class FriendlyCaptchaIntegration extends AbstractIntegration
                     'data'        => isset($data['version']) ? $data['version'] : 'v1',
                 ]
             );
+            $builder->add(
+                'default_embed_type',
+                ChoiceType::class,
+                [
+                    'choices' => [
+                        'mautic.friendlycaptcha.legacy' => 'legacy',
+                        'mautic.friendlycaptcha.auto' => 'auto',
+                        'mautic.friendlycaptcha.manual' => 'manual',
+                    ],
+                    'label'      => 'mautic.friendlycaptcha.default_embed_type',
+                    'help'       => 'mautic.friendlycaptcha.embed_type_tooltip',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class'    => 'form-control',
+                    ],
+                    'required'    => false,
+                    'placeholder' => false,
+                    'data'        => isset($data['default_embed_type']) ? $data['default_embed_type'] : 'legacy',
+                ]
+            );
+            $builder->add(
+                'load_delay',
+                ChoiceType::class,
+                [
+                    'choices' => [
+                        'mautic.friendlycaptcha.timeout' => 'timeout',
+                        'mautic.friendlycaptcha.on_script_load' => 'on_script_load',
+                    ],
+                    'label'      => 'mautic.friendlycaptcha.load_delay',
+                    'help'       => 'mautic.friendlycaptcha.load_delay_tooltip',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class'    => 'form-control',
+                    ],
+                    'required'    => false,
+                    'placeholder' => false,
+                    'data'        => isset($data['load_delay']) ? $data['load_delay'] : 'timeout',
+                ]
+            );
         }
     }
 }

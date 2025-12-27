@@ -13,7 +13,7 @@
     {% set fcWidgetModuleJs = getAssetUrl('plugins/MauticFriendlyCaptchaBundle/Assets/js/v2/site.min.js', null, null, true) %}
 {% endif %}
 
-{% set formName = formName|default('')|replace({'_': ''}) %}
+{% set formName = formName|default('') %}
 {% set hashedFormName = md5(formName) %}
 {% set siteKey = field.customParameters.site_key %}
 
@@ -22,38 +22,96 @@
 
 {% set containerAttributes = htmlAttributesStringToArray(field.containerAttributes|default('')) %}
 {% set containerAttributes = containerAttributes|merge({
-    'id': 'mauticform' ~ formName ~ '_' ~ id,
-    'class': containerAttributes.class|default([])|merge([
-        'mauticform-row',
-        'mauticform-' ~ containerClass,
-        'mauticform-field-' ~ field.order|default(0),
-    ]),
+        'id': 'mauticform' ~ formName|default('') ~ '_' ~ id,
+        'class': containerAttributes.class|default([])|merge([
+          'mauticform-row',
+          'mauticform-' ~ containerClass,
+          'mauticform-field-' ~ field.order|default(0),
+        ]),
 }) %}
 
 <div {{ _self.renderAttributes(containerAttributes) }} >
     {% if inForm is defined and true == inForm %}
         <label class="text-muted">{{ field.label|purify }}</label>
     {% else %}
-        {% set captchaWrapperId = 'mauticform_' ~ formName ~ '_' ~ id ~ '_captcha' %}
+        {% set captchaWrapperId = 'mauticform_' ~ formName ~ '_' ~ id ~ '_captchawrapper' %}
         <div id="{{ captchaWrapperId }}">
             {% set inputName = 'mauticform[' ~ field.alias ~ ']' %}
-            <script src="{{ js }}"></script>
-            <script type="module" src="{{ fcWidgetModuleJs }}" async defer></script>
-            <script nomodule src="{{ fcWidgetJs }}" async defer></script>
+
+            {% set fclib %}
+            {% endset %}
+
+            {% block scripts %}
+            
+            {{ fclib|raw }}
 
             <script type="text/javascript">
-                window.setTimeout(function() {
-                    FriendlyCaptchaMautic.scheduleAddCaptcha(
-                        '{{ captchaWrapperId }}',
-                        '{{ inputName }}',
-                        '{{ siteKey }}',
-                        '{{ version }}',
-                        '{{ field.properties.mode }}'
-                    );
-                }, 2000);
+                (function () {
+                    if (!window.FriendlyCaptchaMauticScriptsLoaded) {
+                        window.FriendlyCaptchaMauticScriptsLoaded = true;
+                        const s = document.createElement("script");
+                        document.head.appendChild(s);
+                        {% if field.customParameters.load_delay == 'on_script_load' %}
+                        s.onload = function () {
+                            window.FriendlyCaptchaMautic.scheduleAddCaptcha(
+                                '{{ captchaWrapperId }}',
+                                '{{ inputName }}',
+                                '{{ siteKey }}',
+                                '{{ version }}',
+                                '{{ field.properties.mode }}'
+                            );
+                        };
+                        {% endif %}
+                        s.src = "{{ js }}";
+
+                        {% if field.customParameters.load_delay == 'timeout' %}
+                        window.setTimeout(function() {
+                            FriendlyCaptchaMautic.scheduleAddCaptcha(
+                                '{{ captchaWrapperId }}',
+                                '{{ inputName }}',
+                                '{{ siteKey }}',
+                                '{{ version }}',
+                                '{{ field.properties.mode }}'
+                            );
+                        }, 2000);
+                        {% endif %}
+                    }
+                })();
             </script>
+            {% endblock %}
+
+            {% if field.customParameters.embed_type == 'legacy' %}
+                
+                {% set fclib %}
+                <script type="module" src="{{ fcWidgetModuleJs }}" async defer></script>
+                <script nomodule src="{{ fcWidgetJs }}" async defer></script> 
+                {% endset %}
+
+                {{ block('scripts') }}
+
+            {% elseif field.customParameters.embed_type == 'auto' %}
+                
+                {{ block('scripts') }}
+
+            {% else %}
+                <script type="text/javascript">
+                    window.FriendlyCaptchaQueue = window.FriendlyCaptchaQueue || [];
+                    window.FriendlyCaptchaQueue.push(
+                        {
+                            wrapperId: '{{ captchaWrapperId }}',
+                            inputName: '{{ inputName }}',
+                            siteKey: '{{ siteKey }}',
+                            version: '{{ version }}',
+                            mode: '{{ field.properties.mode }}'
+                        }
+                    );
+                </script>
+            {% endif %}
         </div>
+
+        {% set errormsgcontainerid = 'mauticform_' ~ formName ~ '_' ~ id %}
         <span class="mauticform-errormsg" style="display: none;"></span>
+      
     {% endif %}
 </div>
 
