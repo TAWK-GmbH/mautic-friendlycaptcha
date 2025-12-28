@@ -28,10 +28,12 @@
             startMode: mode,
             formFieldName: inputName
         });
+
+        console.debug(`Captcha ${inputName} added to the form.`);
     }
 
     function checkPresenceOfFriendlyChallenge(version) {
-        return 'v1' == version && friendlyChallenge || 'v2' == version && frcaptcha;
+        return 'v1' == version && typeof friendlyChallenge !== "undefined" || 'v2' == version && typeof frcaptcha !== "undefined";
     }
 
     /**
@@ -49,13 +51,16 @@
             return;
         }
 
+        console.debug('Waiting for Friendly Captcha library to load...');
+
         const timer = setInterval(function () {
             if (checkPresenceOfFriendlyChallenge(version)) {
                 addCaptcha(wrapper, inputName, siteKey, version, mode);
                 clearInterval(timer);
-            }    
-            
-        }, 5000);
+            } else {
+                console.debug('Waiting for Friendly Captcha library to load...');
+            }
+        }, 500);
     };
 
     function displayCaptchasInForms(queue) {

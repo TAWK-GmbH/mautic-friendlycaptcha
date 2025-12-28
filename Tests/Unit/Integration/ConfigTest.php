@@ -59,5 +59,7 @@ class ConfigTest extends TestCase
         $this->assertEquals(null, $config->getSecretKey());
         $this->assertEquals(null, $config->getSiteKey());
         $this->assertEquals('v1', $config->getVersion());
+        $this->assertEquals('legacy', $config->getEmbedType());
+        $this->assertEquals('timeout', $config->getLoadDelay());
     }
 }

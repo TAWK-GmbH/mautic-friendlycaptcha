@@ -64,6 +64,8 @@ class FormSubscriber implements EventSubscriberInterface
             ],
             'site_key' => $this->config->getSiteKey(),
             'version'  => $this->config->getVersion(),
+            'embed_type' => $this->config->getEmbedType(),
+            'load_delay' => $this->config->getLoadDelay(),
         ]);
 
         $event->addValidator($this::class::VALIDATOR_KEY, [
