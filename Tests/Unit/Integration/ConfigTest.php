@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticFriendlyCaptchaBundle\Tests\Unit\Integration;
 
-use Mautic\PluginBundle\Helper\IntegrationHelper;
-use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Mautic\IntegrationsBundle\Integration\BasicIntegration;
+use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
+use Mautic\PluginBundle\Entity\Integration;
 use MauticPlugin\MauticFriendlyCaptchaBundle\Integration\Config;
 use PHPUnit\Framework\TestCase;
 
@@ -13,12 +14,15 @@ class ConfigTest extends TestCase
 {
     private $integrationObject;
     private $integrationHelper;
+    private $integration;
 
     protected function setUp(): void
     {
-        $this->integrationHelper = $this->createMock(originalClassName: IntegrationHelper::class);
-        $this->integrationObject = $this->createMock(AbstractIntegration::class);
-        $this->integrationHelper->method('getIntegrationObject')->willReturn($this->integrationObject);
+        $this->integrationHelper = $this->createMock(originalClassName: IntegrationsHelper::class);
+        $this->integrationObject = $this->createMock(BasicIntegration::class);
+        $this->integration = $this->createMock(Integration::class);
+        $this->integrationObject->method('getIntegrationConfiguration')->willReturn($this->integration);
+        $this->integrationHelper->method('getIntegration')->willReturn($this->integrationObject);
     }
 
     public function getPluginNotConfiguredDataProvider(): array
@@ -41,8 +45,8 @@ class ConfigTest extends TestCase
      */
     public function testPluginNotConfigured(array $options)
     {
-        $this->integrationObject
-            ->method('getKeys')
+        $this->integration
+            ->method('getApiKeys')
             ->willReturn($options);
         $config = new Config($this->integrationHelper);
 
@@ -51,15 +55,18 @@ class ConfigTest extends TestCase
 
     public function testDefault()
     {
-        $this->integrationObject
-            ->method('getKeys')
+        $this->integration
+            ->method('getApiKeys')
+            ->willReturn([]);
+        $this->integration
+            ->method('getFeatureSettings')
             ->willReturn([]);
         $config = new Config($this->integrationHelper);
 
-        $this->assertEquals(null, $config->getSecretKey());
-        $this->assertEquals(null, $config->getSiteKey());
-        $this->assertEquals('v1', $config->getVersion());
-        $this->assertEquals('legacy', $config->getEmbedType());
-        $this->assertEquals('timeout', $config->getLoadDelay());
+        $this->assertFalse(isset($config->getApiKeys()['secret_key']));
+        $this->assertFalse(isset($config->getApiKeys()['site_key']));
+        $this->assertEquals(Config::FC_API_V2, $config->getVersion());
+        $this->assertEquals(Config::FC_EMBED_LEGACY, $config->getEmbedType());
+        $this->assertEquals(Config::FC_LOAD_DELAY_TIMEOUT, $config->getLoadDelay());
     }
 }

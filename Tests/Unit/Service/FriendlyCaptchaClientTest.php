@@ -24,8 +24,7 @@ class FriendlyCaptchaClientTest extends TestCase
     protected function setUp(): void
     {
         $this->config = $this->createMock(Config::class);
-        $this->config->method('getSecretKey')->willReturn('a');
-        $this->config->method('getSiteKey')->willReturn('b');
+        $this->config->method('getApiKeys')->willReturn(['secret_key' => 'a', 'site_key' => 'b']);
 
         $this->logger     = $this->createMock(LoggerInterface::class);
         $this->httpClient = $this->createMock(ClientInterface::class);
@@ -73,8 +72,8 @@ class FriendlyCaptchaClientTest extends TestCase
             ['Content-Type' => ['application/json']],
             json_encode([
                 'solution' => FriendlyCaptchaClientTest::CAPTCHA_TOKEN,
-                'sitekey'  => $this->config->getSiteKey(),
-                'secret'   => $this->config->getSecretKey(),
+                'sitekey'  => $this->config->getApiKeys()['site_key'],
+                'secret'   => $this->config->getApiKeys()['secret_key'],
             ])
         );
     }
@@ -86,10 +85,10 @@ class FriendlyCaptchaClientTest extends TestCase
         $this->verify(
             'POST',
             'https://global.frcapi.com/api/v2/captcha/siteverify',
-            ['Content-Type' => ['application/json'], 'X-API-Key' => [$this->config->getSecretKey()]],
+            ['Content-Type' => ['application/json'], 'X-API-Key' => [$this->config->getApiKeys()['secret_key']]],
             json_encode([
                 'response' => FriendlyCaptchaClientTest::CAPTCHA_TOKEN,
-                'sitekey'  => $this->config->getSiteKey(),
+                'sitekey'  => $this->config->getApiKeys()['site_key'],
             ])
         );
     }

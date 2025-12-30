@@ -66,7 +66,7 @@ class FormSubscriberTest extends TestCase
     {
         $this->config->method('isConfigured')->willReturn(true);
         $this->config->method('getVersion')->willReturn('a');
-        $this->config->method('getSiteKey')->willReturn('b');
+        $this->config->method('getApiKeys')->willReturn(['site_key' => 'b']);
         $this->config->method('getEmbedType')->willReturn('legacy');
         $this->config->method('getLoadDelay')->willReturn('timeout');
 
@@ -77,7 +77,7 @@ class FormSubscriberTest extends TestCase
 
         $pluginField = $fields['plugin.friendlycaptcha'];
         $this->arrayHasKey('site_key')->evaluate($pluginField);
-        $this->assertEquals($this->config->getSiteKey(), $pluginField['site_key']);
+        $this->assertEquals($this->config->getApiKeys()['site_key'], $pluginField['site_key']);
         $this->assertEquals($this->config->getVersion(), $pluginField['version']);
         $this->arrayHasKey('version')->evaluate($pluginField);
         $this->arrayHasKey('embed_type')->evaluate($pluginField);
