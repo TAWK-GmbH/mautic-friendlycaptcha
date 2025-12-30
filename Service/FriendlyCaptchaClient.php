@@ -29,13 +29,13 @@ class FriendlyCaptchaClient
         $headers = ['Content-Type' => 'application/json'];
 
         $body    = 'v1' == $this->config->getVersion()
-            ? ['solution' => $solution, 'sitekey' => $this->config->getSiteKey()]
-            : ['response' => $solution, 'sitekey' => $this->config->getSiteKey()];
+            ? ['solution' => $solution, 'sitekey' => $this->config->getApiKeys()['site_key']]
+            : ['response' => $solution, 'sitekey' => $this->config->getApiKeys()['site_key']];
 
         if ('v1' == $this->config->getVersion()) {
-            $body['secret'] = $this->config->getSecretKey();
+            $body['secret'] = $this->config->getApiKeys()['secret_key'];
         } else {
-            $headers['X-API-Key'] = $this->config->getSecretKey();
+            $headers['X-API-Key'] = $this->config->getApiKeys()['secret_key'];
         }
 
         $request = new Request('POST', $url, $headers, json_encode($body));

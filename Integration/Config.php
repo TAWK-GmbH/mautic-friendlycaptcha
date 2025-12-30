@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticFriendlyCaptchaBundle\Integration;
 
-use Mautic\PluginBundle\Helper\IntegrationHelper;
-use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
+use Mautic\PluginBundle\Entity\Integration;
 
 class Config
 {
@@ -14,58 +15,73 @@ class Config
     public const FC_EMBED_LEGACY = 'legacy';
     public const FC_LOAD_DELAY_TIMEOUT = 'timeout';
 
-    private string $siteKey = '';
-
-    private string $secretKey = '';
-
-    private string $version = 'v1';
-
-    private string $embedType = 'legacy';
-
-    private string $loadDelay = 'timeout';
-
     public function __construct(
-        private IntegrationHelper $integrationHelper,
+        private IntegrationsHelper $integrationsHelper,
     ) {
-        $integrationObject = $integrationHelper->getIntegrationObject(FriendlyCaptchaIntegration::INTEGRATION_NAME);
+    }
+    
+    public function isPublished(): bool
+    {
+        try {
+            $integration = $this->getIntegrationEntity();
 
-        if ($integrationObject instanceof AbstractIntegration) {
-            $keys            = $integrationObject->getKeys();
-            $this->siteKey   = isset($keys['site_key']) ? $keys['site_key'] : '';
-            $this->secretKey = isset($keys['secret_key']) ? $keys['secret_key'] : '';
-            $this->version   = isset($keys['version']) ? $keys['version'] : $this::class::FC_API_V1;
-            $this->embedType = isset($keys['default_embed_type']) ? $keys['default_embed_type'] : $this::class::FC_EMBED_LEGACY;
-            $this->loadDelay = isset($keys['load_delay']) ? $keys['load_delay'] : $this::class::FC_LOAD_DELAY_TIMEOUT;
+            return (bool) $integration->getIsPublished() ?: false;
+        } catch (IntegrationNotFoundException $e) {
+            return false;
         }
-    }
-
-    public function getSiteKey(): string
-    {
-        return $this->siteKey;
-    }
-
-    public function getSecretKey(): string
-    {
-        return $this->secretKey;
-    }
-
-    public function getVersion(): string
-    {
-        return $this->version;
-    }
-
-    public function getEmbedType(): string
-    {
-        return $this->embedType;
-    }
-
-    public function getLoadDelay(): string
-    {
-        return $this->loadDelay;
     }
 
     public function isConfigured(): bool
     {
-        return !empty($this->siteKey) && !empty($this->secretKey);
+        $apiKeys = $this->getApiKeys();
+
+        return !empty($apiKeys['site_key']) && !empty($apiKeys['secret_key']);
+    }
+
+    public function getVersion(): string
+    {
+        $data = $this->getFeatureSettings();
+        return $data['version'] ?? Config::FC_API_V2;
+    }
+
+    public function getEmbedType(): string
+    {
+        $data = $this->getFeatureSettings();
+        return $data['default_embed_type'] ?? Config::FC_EMBED_LEGACY;
+    }
+
+    public function getLoadDelay(): string
+    {
+        $data = $this->getFeatureSettings();
+        return $data['load_delay'] ?? Config::FC_LOAD_DELAY_TIMEOUT;
+    }
+
+    public function getApiKeys(): array
+    {
+        try {
+            $integration = $this->getIntegrationEntity();
+
+            return $integration->getApiKeys() ?: [];
+        } catch (IntegrationNotFoundException $e) {
+            return [];
+        }
+    }
+
+    public function getFeatureSettings(): array
+    {
+        try {
+            $integration = $this->getIntegrationEntity();
+
+            return $integration->getFeatureSettings() ?: [];
+        } catch (IntegrationNotFoundException $e) {
+            return [];
+        }
+    }
+
+    public function getIntegrationEntity(): Integration
+    {
+        $integrationObject = $this->integrationsHelper->getIntegration(FriendlyCaptchaIntegration::INTEGRATION_NAME);
+
+        return $integrationObject->getIntegrationConfiguration();
     }
 }

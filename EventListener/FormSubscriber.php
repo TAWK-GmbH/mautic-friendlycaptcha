@@ -62,7 +62,7 @@ class FormSubscriber implements EventSubscriberInterface
                 'addDefaultValue'  => false,
                 'addSaveResult'    => true,
             ],
-            'site_key' => $this->config->getSiteKey(),
+            'site_key' => $this->config->getApiKeys()['site_key'],
             'version'  => $this->config->getVersion(),
             'embed_type' => $this->config->getEmbedType(),
             'load_delay' => $this->config->getLoadDelay(),

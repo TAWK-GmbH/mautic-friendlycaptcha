@@ -2,7 +2,7 @@
     "name": "tawk/mautic-friendlycaptcha-bundle",
     "description": "This plugin brings Friendly Captcha integration to mautic.",
     "type": "mautic-plugin",
-    "version": "2.0.0",
+    "version": "3.0.0",
     "license": "GPL-3.0-only",
     "authors": [
         {
@@ -15,7 +15,7 @@
         "install-directory-name": "MauticFriendlyCaptcha"
     },
     "require": {
-         "mautic/core-lib": "^5.0"
+        "mautic/core-lib": "^5.0"
     },
     "scripts": {
         "test": [

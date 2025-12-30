@@ -9,33 +9,27 @@
 declare(strict_types=1);
 
 use MauticPlugin\MauticFriendlyCaptchaBundle\Integration\FriendlyCaptchaIntegration;
+use MauticPlugin\MauticFriendlyCaptchaBundle\Integration\Support\ConfigSupport;
 
 return [
     'name'        => 'Friendly Captcha',
     'description' => 'Enables Friendly Captcha integration.',
-    'version'     => '1.2.0',
+    'version'     => '3.0.0',
     'author'      => 'Daniel Band',
     'services'    => [
         'integrations' => [
             'mautic.integration.friendlycaptcha' => [
                 'class'     => FriendlyCaptchaIntegration::class,
-                'arguments' => [
-                    'event_dispatcher',
-                    'mautic.helper.cache_storage',
-                    'doctrine.orm.entity_manager',
-                    'session',
-                    'request_stack',
-                    'router',
-                    'translator',
-                    'logger',
-                    'mautic.helper.encryption',
-                    'mautic.lead.model.lead',
-                    'mautic.lead.model.company',
-                    'mautic.helper.paths',
-                    'mautic.core.model.notification',
-                    'mautic.lead.model.field',
-                    'mautic.plugin.model.integration_entity',
-                    'mautic.lead.model.dnc',
+                'tags'      => [
+                    'mautic.basic_integration',
+                ],
+            ],
+            // Provides the form types to use for the configuration UI
+            'mautic.integration.friendlycaptcha.configuration' => [
+                'class'     => ConfigSupport::class,
+                'arguments' => [],
+                'tags'      => [
+                    'mautic.config_integration',
                 ],
             ],
         ],
