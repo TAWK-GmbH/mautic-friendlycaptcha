@@ -1,6 +1,6 @@
 # Mautic Friendly Captcha Plugin
 
-This plugin integrates Friendly Captcha with Mautic 5.
+This plugin integrates Friendly Captcha with Mautic 5 and 6.
 
 Friendly Captcha is a protected trademark. All Friendly Captcha trademarks, logos and brand names are the sole property of Friendly Captcha GmbH, Germany. Use of them does not imply any affiliation with or endorsement by them.
 
