@@ -16,11 +16,6 @@ class ConfigSupport extends FriendlyCaptchaIntegration implements ConfigFormInte
 {
     use DefaultConfigFormTrait;
 
-    public function getDisplayName(): string
-    {
-        return 'Friendly Captcha';
-    }
-
     public function getAuthConfigFormName(): string
     {
       return ConfigAuthType::class;
