@@ -4,6 +4,9 @@ This plugin integrates Friendly Captcha with Mautic 5 and 6.
 
 Friendly Captcha is a protected trademark. All Friendly Captcha trademarks, logos and brand names are the sole property of Friendly Captcha GmbH, Germany. Use of them does not imply any affiliation with or endorsement by them.
 
+## Installation
+Download the latests release and extract all files into a folder MauticFriendlyCaptchaBundle / rename the topmost folder. Place the folder into the plugins directory of your Mautic installation, clear the cache and press "Install/Upgrade Plugins"
+
 ## Modes
 This plugin supports three different embedding modes, depending on your use case:
 - Legacy (default)
