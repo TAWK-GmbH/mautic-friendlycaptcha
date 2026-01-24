@@ -38,21 +38,33 @@
         <div id="{{ captchaWrapperId }}">
             {% set inputName = 'mauticform[' ~ field.alias ~ ']' %}
 
-            {% set fclib %}
-            {% endset %}
+            {% if field.customParameters.embed_type == 'legacy' %}
+                <script type="module" src="{{ fcWidgetModuleJs }}" async defer></script>
+                <script nomodule src="{{ fcWidgetJs }}" async defer></script>
+            {% endif %}
+            {% if field.customParameters.embed_type == 'legacy' or field.customParameters.embed_type == 'auto' %}
+                <script type="text/javascript">
+                    (function () {
+                        if (!window.FriendlyCaptchaMauticScriptsLoaded) {
+                            window.FriendlyCaptchaMauticScriptsLoaded = true;
+                            const s = document.createElement("script");
+                            document.head.appendChild(s);
+                            {% if field.customParameters.load_delay == 'on_script_load' %}
+                            s.onload = function () {
+                                console.log("flush queue");
+                                const q = window.FriendlyCaptchaMauticFormQueue || [];
+                                console.log(q);
+                                q.forEach(cb => { try { cb(); } catch (e) { console.error(e); } });
+                            };
+                            {% endif %}
+                            s.onerror = function (e) {
+                                window.FriendlyCaptchaMauticScriptsLoaded = false;
+                                console.error("Failed to load FriendlyCaptchaMautic script", e);
+                            };
+                            s.src = "{{ js }}";
+                        }
 
-            {% block scripts %}
-            
-            {{ fclib|raw }}
-
-            <script type="text/javascript">
-                (function () {
-                    if (!window.FriendlyCaptchaMauticScriptsLoaded) {
-                        window.FriendlyCaptchaMauticScriptsLoaded = true;
-                        const s = document.createElement("script");
-                        document.head.appendChild(s);
-                        {% if field.customParameters.load_delay == 'on_script_load' %}
-                        s.onload = function () {
+                        const cb = function () {
                             window.FriendlyCaptchaMautic.scheduleAddCaptcha(
                                 '{{ captchaWrapperId }}',
                                 '{{ inputName }}',
@@ -61,38 +73,21 @@
                                 '{{ field.properties.mode }}'
                             );
                         };
-                        {% endif %}
-                        s.src = "{{ js }}";
 
                         {% if field.customParameters.load_delay == 'timeout' %}
-                        window.setTimeout(function() {
-                            FriendlyCaptchaMautic.scheduleAddCaptcha(
-                                '{{ captchaWrapperId }}',
-                                '{{ inputName }}',
-                                '{{ siteKey }}',
-                                '{{ version }}',
-                                '{{ field.properties.mode }}'
-                            );
-                        }, 2000);
+                        setTimeout(cb, 2000);
+                        {% else %}
+                        window.FriendlyCaptchaMauticFormQueue = window.FriendlyCaptchaMauticFormQueue || [];
+                        if (window.FriendlyCaptchaMautic) {
+                            cb();
+                        } else {
+                            console.log("add to queue");
+                            console.log(window.FriendlyCaptchaMautic);
+                            window.FriendlyCaptchaMauticFormQueue.push(cb);
+                        }
                         {% endif %}
-                    }
-                })();
-            </script>
-            {% endblock %}
-
-            {% if field.customParameters.embed_type == 'legacy' %}
-                
-                {% set fclib %}
-                <script type="module" src="{{ fcWidgetModuleJs }}" async defer></script>
-                <script nomodule src="{{ fcWidgetJs }}" async defer></script> 
-                {% endset %}
-
-                {{ block('scripts') }}
-
-            {% elseif field.customParameters.embed_type == 'auto' %}
-                
-                {{ block('scripts') }}
-
+                    })();
+                </script>
             {% else %}
                 <script type="text/javascript">
                     window.FriendlyCaptchaQueue = window.FriendlyCaptchaQueue || [];
