@@ -51,7 +51,7 @@
                             document.head.appendChild(s);
                             {% if field.customParameters.load_delay == 'on_script_load' %}
                             s.onload = function () {
-                                const q = window.FriendlyCaptchaMauticFormQueue || [];
+                                const q = window.FriendlyCaptchaQueue || [];
                                 q.forEach(cb => { try { cb(); } catch (e) { console.error(e); } });
                             };
                             {% endif %}
@@ -75,11 +75,11 @@
                         {% if field.customParameters.load_delay == 'timeout' %}
                         setTimeout(cb, 2000);
                         {% else %}
-                        window.FriendlyCaptchaMauticFormQueue = window.FriendlyCaptchaMauticFormQueue || [];
                         if (window.FriendlyCaptchaMautic) {
                             cb();
                         } else {
-                            window.FriendlyCaptchaMauticFormQueue.push(cb);
+                            window.FriendlyCaptchaQueue = window.FriendlyCaptchaQueue || [];
+                            window.FriendlyCaptchaQueue.push(cb);
                         }
                         {% endif %}
                     })();
