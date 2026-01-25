@@ -41,19 +41,19 @@ class Config
     public function getVersion(): string
     {
         $data = $this->getFeatureSettings();
-        return $data['version'] ?? Config::FC_API_V2;
+        return $data['integration']['version'] ?? Config::FC_API_V2;
     }
 
     public function getEmbedType(): string
     {
         $data = $this->getFeatureSettings();
-        return $data['default_embed_type'] ?? Config::FC_EMBED_LEGACY;
+        return $data['integration']['default_embed_type'] ?? Config::FC_EMBED_LEGACY;
     }
 
     public function getLoadDelay(): string
     {
         $data = $this->getFeatureSettings();
-        return $data['load_delay'] ?? Config::FC_LOAD_DELAY_TIMEOUT;
+        return $data['integration']['load_delay'] ?? Config::FC_LOAD_DELAY_TIMEOUT;
     }
 
     public function getApiKeys(): array
