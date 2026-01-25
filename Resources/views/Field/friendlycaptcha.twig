@@ -51,9 +51,7 @@
                             document.head.appendChild(s);
                             {% if field.customParameters.load_delay == 'on_script_load' %}
                             s.onload = function () {
-                                console.log("flush queue");
                                 const q = window.FriendlyCaptchaMauticFormQueue || [];
-                                console.log(q);
                                 q.forEach(cb => { try { cb(); } catch (e) { console.error(e); } });
                             };
                             {% endif %}
@@ -81,8 +79,6 @@
                         if (window.FriendlyCaptchaMautic) {
                             cb();
                         } else {
-                            console.log("add to queue");
-                            console.log(window.FriendlyCaptchaMautic);
                             window.FriendlyCaptchaMauticFormQueue.push(cb);
                         }
                         {% endif %}
