@@ -59,6 +59,9 @@ class Config
         return $data['integration']['load_delay'] ?? Config::FC_LOAD_DELAY_TIMEOUT;
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function getApiKeys(): array
     {
         try {
@@ -70,6 +73,9 @@ class Config
         }
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getFeatureSettings(): array
     {
         try {

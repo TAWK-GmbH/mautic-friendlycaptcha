@@ -7,6 +7,7 @@ namespace MauticPlugin\MauticFriendlyCaptchaBundle\Tests\Unit\Service;
 use GuzzleHttp\Psr7\Request;
 use MauticPlugin\MauticFriendlyCaptchaBundle\Integration\Config;
 use MauticPlugin\MauticFriendlyCaptchaBundle\Service\FriendlyCaptchaClient;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -15,11 +16,11 @@ use Psr\Log\LoggerInterface;
 class FriendlyCaptchaClientTest extends TestCase
 {
     private const CAPTCHA_TOKEN = 'atesttoken';
-    private $config;
+    private MockObject $config;
     private FriendlyCaptchaClient $fcClient;
-    private $httpClient;
-    private $response;
-    private $logger;
+    private MockObject $httpClient;
+    private MockObject $response;
+    private MockObject $logger;
 
     protected function setUp(): void
     {
@@ -36,7 +37,10 @@ class FriendlyCaptchaClientTest extends TestCase
         );
     }
 
-    public function verify(string $method, string $url, array $headers, string $body)
+    /**
+     * @param array<string, string[]> $headers
+     */
+    public function verify(string $method, string $url, array $headers, string $body): void
     {
         $this->response->method('getStatusCode')->willReturn(200);
         $this->response->method('getBody')->willReturn(json_encode(['success' => true]));
@@ -62,7 +66,7 @@ class FriendlyCaptchaClientTest extends TestCase
         $this->assertTrue($this->fcClient->verify(FriendlyCaptchaClientTest::CAPTCHA_TOKEN));
     }
 
-    public function testVerifyV1()
+    public function testVerifyV1(): void
     {
         $this->config->method('getVersion')->willReturn(Config::FC_API_V1);
 
@@ -78,7 +82,7 @@ class FriendlyCaptchaClientTest extends TestCase
         );
     }
 
-    public function testVerifyV2()
+    public function testVerifyV2(): void
     {
         $this->config->method('getVersion')->willReturn(Config::FC_API_V2);
 

@@ -12,23 +12,21 @@ use MauticPlugin\MauticFriendlyCaptchaBundle\EventListener\FormSubscriber;
 use MauticPlugin\MauticFriendlyCaptchaBundle\FriendlyCaptchaEvents;
 use MauticPlugin\MauticFriendlyCaptchaBundle\Integration\Config;
 use MauticPlugin\MauticFriendlyCaptchaBundle\Service\FriendlyCaptchaClient;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class FormSubscriberTest extends TestCase
 {
     private FormBuilderEvent $formBuildEvent;
-    private $eventDispatcher;
-    private $config;
-    private $fcClient;
-    private $translator;
-    private $logger;
+    private MockObject $config;
+    private MockObject $fcClient;
+    private MockObject $translator;
+    private MockObject $logger;
     private FormSubscriber $subscriber;
 
     protected function setUp(): void
     {
-        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->config          = $this->createMock(Config::class);
         $this->fcClient        = $this->createMock(FriendlyCaptchaClient::class);
         $this->translator      = $this->createMock(Translator::class);
@@ -36,7 +34,6 @@ class FormSubscriberTest extends TestCase
         $this->formBuildEvent  = new FormBuilderEvent($this->translator);
 
         $this->subscriber = new FormSubscriber(
-            $this->eventDispatcher,
             $this->config,
             $this->fcClient,
             $this->translator,
@@ -44,7 +41,7 @@ class FormSubscriberTest extends TestCase
         );
     }
 
-    public function testSubscribeEvents()
+    public function testSubscribeEvents(): void
     {
         $events = $this->subscriber->getSubscribedEvents();
         $this->assertEqualsCanonicalizing([
@@ -53,7 +50,7 @@ class FormSubscriberTest extends TestCase
         ], $events);
     }
 
-    public function testDontBuildFormOnConfigError()
+    public function testDontBuildFormOnConfigError(): void
     {
         $this->config->method('isConfigured')->willReturn(false);
 
@@ -62,7 +59,7 @@ class FormSubscriberTest extends TestCase
         $this->subscriber->onFormBuild($this->formBuildEvent);
     }
 
-    public function testOnFormBuild()
+    public function testOnFormBuild(): void
     {
         $this->config->method('isConfigured')->willReturn(true);
         $this->config->method('getVersion')->willReturn('a');
@@ -90,7 +87,7 @@ class FormSubscriberTest extends TestCase
         $this->assertEquals($validators['plugin.friendlycaptcha'], FriendlyCaptchaEvents::ON_FORM_CUSTOM_FIELD_VALIDATION);
     }
 
-    public function testDontValidateFormOnConfigError()
+    public function testDontValidateFormOnConfigError(): void
     {
         $this->config->method('isConfigured')->willReturn(false);
         $this->logger->expects($this->once())->method(constraint: 'error');
@@ -102,7 +99,7 @@ class FormSubscriberTest extends TestCase
         $this->subscriber->onFormValidateCustomField($event);
     }
 
-    public function testOnFormValidateSuccess()
+    public function testOnFormValidateSuccess(): void
     {
         $this->config->method('isConfigured')->willReturn(true);
 
@@ -121,7 +118,7 @@ class FormSubscriberTest extends TestCase
         $this->subscriber->onFormValidateCustomField($event);
     }
 
-    public function testOnFormValidateFailure()
+    public function testOnFormValidateFailure(): void
     {
         $this->config->method('isConfigured')->willReturn(true);
 

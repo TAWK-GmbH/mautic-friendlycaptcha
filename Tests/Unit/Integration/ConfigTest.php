@@ -8,24 +8,28 @@ use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use Mautic\IntegrationsBundle\Integration\BasicIntegration;
 use Mautic\PluginBundle\Entity\Integration;
 use MauticPlugin\MauticFriendlyCaptchaBundle\Integration\Config;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class ConfigTest extends TestCase
 {
-    private $integrationObject;
-    private $integrationHelper;
-    private $integration;
+    private MockObject $integrationObject;
+    private MockObject $integrationHelper;
+    private MockObject $integration;
 
     protected function setUp(): void
     {
-        $this->integrationHelper = $this->createMock(originalClassName: IntegrationsHelper::class);
+        $this->integrationHelper = $this->createMock(IntegrationsHelper::class);
         $this->integrationObject = $this->createMock(BasicIntegration::class);
         $this->integration       = $this->createMock(Integration::class);
         $this->integrationObject->method('getIntegrationConfiguration')->willReturn($this->integration);
         $this->integrationHelper->method('getIntegration')->willReturn($this->integrationObject);
     }
 
-    public function getPluginNotConfiguredDataProvider(): array
+    /**
+     * @return array<string, array{0: array<string, string>}>
+     */
+    public static function getPluginNotConfiguredDataProvider(): array
     {
         return [
             'empty array' => [
@@ -42,8 +46,10 @@ class ConfigTest extends TestCase
 
     /**
      * @dataProvider getPluginNotConfiguredDataProvider
+     *
+     * @param array<string, string> $options
      */
-    public function testPluginNotConfigured(array $options)
+    public function testPluginNotConfigured(array $options): void
     {
         $this->integration
             ->method('getApiKeys')
@@ -53,7 +59,7 @@ class ConfigTest extends TestCase
         $this->assertFalse($config->isConfigured());
     }
 
-    public function testDefault()
+    public function testDefault(): void
     {
         $this->integration
             ->method('getApiKeys')

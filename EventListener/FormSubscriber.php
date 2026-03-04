@@ -19,7 +19,6 @@ use MauticPlugin\MauticFriendlyCaptchaBundle\FriendlyCaptchaEvents;
 use MauticPlugin\MauticFriendlyCaptchaBundle\Integration\Config;
 use MauticPlugin\MauticFriendlyCaptchaBundle\Service\FriendlyCaptchaClient;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class FormSubscriber implements EventSubscriberInterface
@@ -27,7 +26,6 @@ class FormSubscriber implements EventSubscriberInterface
     public const VALIDATOR_KEY = 'plugin.friendlycaptcha.validator';
 
     public function __construct(
-        private EventDispatcherInterface $eventDispatcher,
         private Config $config,
         private FriendlyCaptchaClient $friendlyCaptchaClient,
         private Translator $translator,
@@ -43,7 +41,7 @@ class FormSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onFormBuild(FormBuilderEvent $event)
+    public function onFormBuild(FormBuilderEvent $event): void
     {
         if (!$this->config->isConfigured()) {
             $this->logger->error('FriendlyCaptcha: Please configure site_key and secret_key.');
@@ -74,7 +72,7 @@ class FormSubscriber implements EventSubscriberInterface
         ]);
     }
 
-    public function onFormValidateCustomField(ValidationEvent $event)
+    public function onFormValidateCustomField(ValidationEvent $event): void
     {
         if (!$this->config->isConfigured()) {
             $this->logger->error('FriendlyCaptcha: Please configure site_key and secret_key. Accept form submission anyways.');
@@ -86,6 +84,6 @@ class FormSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $event->failedValidation(null === $this->translator ? 'Captcha verification failed' : $this->translator->trans('mautic.integration.friendlycaptcha.failure_message'));
+        $event->failedValidation($this->translator->trans('mautic.integration.friendlycaptcha.failure_message'));
     }
 }
