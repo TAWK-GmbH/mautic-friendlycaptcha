@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticFriendlyCaptchaBundle\Tests\Unit\Integration;
 
-use Mautic\IntegrationsBundle\Integration\BasicIntegration;
 use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
+use Mautic\IntegrationsBundle\Integration\BasicIntegration;
 use Mautic\PluginBundle\Entity\Integration;
 use MauticPlugin\MauticFriendlyCaptchaBundle\Integration\Config;
 use PHPUnit\Framework\TestCase;
@@ -20,7 +20,7 @@ class ConfigTest extends TestCase
     {
         $this->integrationHelper = $this->createMock(originalClassName: IntegrationsHelper::class);
         $this->integrationObject = $this->createMock(BasicIntegration::class);
-        $this->integration = $this->createMock(Integration::class);
+        $this->integration       = $this->createMock(Integration::class);
         $this->integrationObject->method('getIntegrationConfiguration')->willReturn($this->integration);
         $this->integrationHelper->method('getIntegration')->willReturn($this->integrationObject);
     }

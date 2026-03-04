@@ -12,7 +12,7 @@ class FriendlyCaptchaClient
     public function __construct(
         private ClientInterface $httpClient,
         private LoggerInterface $logger,
-        private Config $config
+        private Config $config,
     ) {
     }
 

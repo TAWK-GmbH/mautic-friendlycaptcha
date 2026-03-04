@@ -3,7 +3,6 @@
 namespace MauticPlugin\MauticFriendlyCaptchaBundle\Integration;
 
 use Mautic\IntegrationsBundle\Integration\BasicIntegration;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 /**
  * Class FriendlyCaptchaIntegration.

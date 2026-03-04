@@ -10,16 +10,16 @@ use Mautic\PluginBundle\Entity\Integration;
 
 class Config
 {
-    public const FC_API_V1 = 'v1';
-    public const FC_API_V2 = 'v2';
-    public const FC_EMBED_LEGACY = 'legacy';
+    public const FC_API_V1             = 'v1';
+    public const FC_API_V2             = 'v2';
+    public const FC_EMBED_LEGACY       = 'legacy';
     public const FC_LOAD_DELAY_TIMEOUT = 'timeout';
 
     public function __construct(
         private IntegrationsHelper $integrationsHelper,
     ) {
     }
-    
+
     public function isPublished(): bool
     {
         try {
@@ -41,18 +41,21 @@ class Config
     public function getVersion(): string
     {
         $data = $this->getFeatureSettings();
+
         return $data['integration']['version'] ?? Config::FC_API_V2;
     }
 
     public function getEmbedType(): string
     {
         $data = $this->getFeatureSettings();
+
         return $data['integration']['default_embed_type'] ?? Config::FC_EMBED_LEGACY;
     }
 
     public function getLoadDelay(): string
     {
         $data = $this->getFeatureSettings();
+
         return $data['integration']['load_delay'] ?? Config::FC_LOAD_DELAY_TIMEOUT;
     }
 

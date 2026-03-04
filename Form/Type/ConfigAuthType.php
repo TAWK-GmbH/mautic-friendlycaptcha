@@ -13,42 +13,42 @@ class ConfigAuthType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $siteKey = null;
+        $siteKey   = null;
         $secretKey = null;
 
         $integration = $options['integration'];
         if ($integration && $integration->getIntegrationConfiguration()) {
-            $creds = $integration->getIntegrationConfiguration()->getApiKeys();
-            $siteKey = $creds['site_key'] ?? null;
+            $creds     = $integration->getIntegrationConfiguration()->getApiKeys();
+            $siteKey   = $creds['site_key'] ?? null;
             $secretKey = $creds['secret_key'] ?? null;
         }
 
         $builder->add(
-          'site_key',
-          TextType::class,
-          [
-              'label'      => 'mautic.integration.friendlycaptcha.site_key',
-              'label_attr' => ['class' => 'control-label'],
-              'required'   => true,
-              'attr'       => [
-                  'class'   => 'form-control',
-              ],
-              'empty_data' => $siteKey,
-          ]
+            'site_key',
+            TextType::class,
+            [
+                'label'      => 'mautic.integration.friendlycaptcha.site_key',
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => true,
+                'attr'       => [
+                    'class'   => 'form-control',
+                ],
+                'empty_data' => $siteKey,
+            ]
         );
 
         $builder->add(
-          'secret_key',
-          TextType::class,
-          [
-              'label'      => 'mautic.integration.friendlycaptcha.secret_key',
-              'label_attr' => ['class' => 'control-label'],
-              'required'   => true,
-              'attr'       => [
-                  'class'   => 'form-control',
-              ],
-              'empty_data' => $secretKey,
-          ]
+            'secret_key',
+            TextType::class,
+            [
+                'label'      => 'mautic.integration.friendlycaptcha.secret_key',
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => true,
+                'attr'       => [
+                    'class'   => 'form-control',
+                ],
+                'empty_data' => $secretKey,
+            ]
         );
     }
 
@@ -56,7 +56,7 @@ class ConfigAuthType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'integration' => null
+                'integration' => null,
             ]
         );
     }

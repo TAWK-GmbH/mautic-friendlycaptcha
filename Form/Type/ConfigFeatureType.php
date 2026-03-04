@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticFriendlyCaptchaBundle\Form\Type;
 
+use MauticPlugin\MauticFriendlyCaptchaBundle\Integration\Config;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use MauticPlugin\MauticFriendlyCaptchaBundle\Integration\Config;
 
 class ConfigFeatureType extends AbstractType
 {
@@ -29,7 +28,7 @@ class ConfigFeatureType extends AbstractType
                 ],
                 'required'    => false,
                 'placeholder' => false,
-                'empty_data'  =>  Config::FC_API_V2,
+                'empty_data'  => Config::FC_API_V2,
             ]
         );
         $builder->add(
@@ -38,7 +37,7 @@ class ConfigFeatureType extends AbstractType
             [
                 'choices' => [
                     'mautic.friendlycaptcha.legacy' => 'legacy',
-                    'mautic.friendlycaptcha.auto' => 'auto',
+                    'mautic.friendlycaptcha.auto'   => 'auto',
                     'mautic.friendlycaptcha.manual' => 'manual',
                 ],
                 'label'      => 'mautic.friendlycaptcha.default_embed_type',
@@ -57,7 +56,7 @@ class ConfigFeatureType extends AbstractType
             ChoiceType::class,
             [
                 'choices' => [
-                    'mautic.friendlycaptcha.timeout' => 'timeout',
+                    'mautic.friendlycaptcha.timeout'        => 'timeout',
                     'mautic.friendlycaptcha.on_script_load' => 'on_script_load',
                 ],
                 'label'      => 'mautic.friendlycaptcha.load_delay',
