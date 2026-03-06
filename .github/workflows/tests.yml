@@ -16,14 +16,13 @@ jobs:
     strategy:
         matrix:
           php-versions: ['8.3'] # The supported PHP versions
-          db-types: ['mysql'] # can be: ['mysql', 'mariadb'] but not necessary for this plugin that does not add any DB schema
           mautic-versions: ['5.2', '6.0', '7.0'] # The supported Mautic versions
 
-    name: Tests on PHP ${{ matrix.php-versions }}, ${{ matrix.db-types }}, Mautic ${{ matrix.mautic-versions }}
+    name: Tests on PHP ${{ matrix.php-versions }}, Mautic ${{ matrix.mautic-versions }}
 
     services:
       database:
-        image: ${{ matrix.db-types == 'mysql' && 'mysql:5.7' || 'mariadb:10.3' }}
+        image: 'mysql:8.4'
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: mautictest
@@ -31,7 +30,7 @@ jobs:
           - 3306
         options: >-
           --shm-size=2gb
-          --name=${{ matrix.db-types }}
+          --name='mysql'
           --tmpfs=/var/lib/mysql
           --health-cmd="mysqladmin ping"
           --health-interval=10s
@@ -110,7 +109,7 @@ jobs:
       run: cat ${{ env.PLUGIN_DIR }}/coverage.xml
 
     - name: Upload coverage report
-      if: ${{ matrix.php-versions == '8.3' && matrix.db-types == 'mysql' && matrix.mautic-versions == '5.2' }}
+      if: ${{ matrix.php-versions == '8.3' && matrix.mautic-versions == '5.2' }}
       uses: codecov/codecov-action@v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
