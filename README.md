@@ -23,7 +23,7 @@ Legacy is the default mode after upgrading the plugin, unless you select another
 If the Friendly Captcha SDK is not yet available in the window, the API script checks for its presence every 500ms. 
 
 **Friendly Captcha versions**
-- v1: 0.9.18
+- v1: 0.9.19
 - v2: 0.1.36
 
 The Friendly Captcha challenge scripts are integrated into this plugin to help with GDPR compliance, provided Mautic is hosted and configured appropriately. This plugin does not guarantee automatic compliance. 

@@ -9,7 +9,7 @@ env:
   RELEASE_PATH: /tmp/release.tar.gz
 
 jobs:
-  validate-tag:
+  release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,7 +19,6 @@ jobs:
         run: |
           # Extract version from config.php (e.g., 1.2.3)
           version=$(grep "'version'" Config/config.php | sed -E "s/.*'version'\s*=>\s*'([^']+)'.*/\1/")
-          echo "[DEBUG] Extracted config.php version: $version"
           if [ -z "$version" ]; then
             echo "Could not extract version from config.php" >&2
             exit 1
@@ -32,32 +31,21 @@ jobs:
           # Use github.ref_name for the tag (e.g., v1.2.3) and strip leading 'v'
           tag_name="${{ github.ref_name }}"
           tag_version=${tag_name#v}
-          echo "[DEBUG] Github tag name: $tag_name"
-          echo "[DEBUG] Tag version (no v): $tag_version"
           echo "tag_version=$tag_version" >> $GITHUB_OUTPUT
 
       - name: Compare tag version and config.php version
         run: |
-          echo "[DEBUG] Comparing config.php version: ${{ steps.get_version.outputs.version }} to tag version: ${{ steps.get_tag_version.outputs.tag_version }}"
           if [ "${{ steps.get_version.outputs.version }}" != "${{ steps.get_tag_version.outputs.tag_version }}" ]; then
             echo "Tag version (${{ steps.get_tag_version.outputs.tag_version }}) does not match config.php version (${{ steps.get_version.outputs.version }})"
             exit 1
           fi
         shell: bash
-  release:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Build artifacts
-        run: tar -czf ${{ env.RELEASE_PATH }} .
 
       - name: Extract latest release notes
         id: extract_notes
         run: |
           # Extract the latest release notes section from CHANGELOG.md
           awk '/^## / && NR>1 {exit} {print}' CHANGELOG.md > LATEST_RELEASE_NOTES.md
-          echo "[DEBUG] Latest release notes extracted:"
           cat LATEST_RELEASE_NOTES.md
 
       - name: Check release notes version matches tag
@@ -67,18 +55,29 @@ jobs:
           changelog_version=$(awk '/^## / {print $2; exit}' CHANGELOG.md)
           tag_name="${{ github.ref_name }}"
           tag_version=${tag_name#v}
-          echo "[DEBUG] Changelog version: $changelog_version"
-          echo "[DEBUG] Tag name: $tag_name"
-          echo "[DEBUG] Tag version (no v): $tag_version"
           if [ "$changelog_version" != "$tag_version" ]; then
             echo "Latest release notes version ($changelog_version) does not match tag version ($tag_version) from tag ($tag_name)."
             exit 1
           fi
           echo "Changelog version matches tag: $tag_name"
 
+      - name: Build artifacts
+        id: build_artifacts
+        run: |
+          tag_name="${{ github.ref_name }}"
+          archive_name="MauticFriendlyCaptchaBundle-${tag_name}"
+          # Create a temp dir and copy all contents into a subfolder named MauticFriendlyCaptchaBundle
+          mkdir -p /tmp/MauticFriendlyCaptchaBundle
+          cp -r ./* /tmp/MauticFriendlyCaptchaBundle/
+          # Remove git-related files and folders
+          rm -rf /tmp/MauticFriendlyCaptchaBundle/.git /tmp/MauticFriendlyCaptchaBundle/.gitignore
+          # Create the archive with the correct folder structure and name
+          tar -czf "/tmp/${archive_name}.tar.gz" -C /tmp MauticFriendlyCaptchaBundle
+          echo "archive_path=/tmp/${archive_name}.tar.gz" >> $GITHUB_OUTPUT
+
       - name: "Create release"
         uses: ncipollo/release-action@v1
         with:
-          artifacts: ${{ env.RELEASE_PATH }}
+          artifacts: ${{ steps.build_artifacts.outputs.archive_path }}
           bodyFile: "LATEST_RELEASE_NOTES.md"
           token: ${{ secrets.GITHUB_TOKEN }}
