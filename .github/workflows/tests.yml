@@ -30,7 +30,7 @@ jobs:
           - 3306
         options: >-
           --shm-size=2gb
-          --name='mysql'
+          --name=mysql
           --tmpfs=/var/lib/mysql
           --health-cmd="mysqladmin ping"
           --health-interval=10s
