@@ -16,7 +16,7 @@ jobs:
     strategy:
         matrix:
           php-versions: ['8.3'] # The supported PHP versions
-          mautic-versions: ['5.2', '6.0', '7.0'] # The supported Mautic versions
+          mautic-versions: ['5.2', '7.0'] # The supported Mautic versions
 
     name: Tests on PHP ${{ matrix.php-versions }}, Mautic ${{ matrix.mautic-versions }}
 
