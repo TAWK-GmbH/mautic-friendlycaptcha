@@ -1,0 +1,73 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+
+env:
+  RELEASE_PATH: /tmp/release.tar.gz
+
+jobs:
+  validate-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Extract version from config.php
+        id: get_version
+        run: |
+          version=$(grep "'version'" plugins/MauticFriendlyCaptchaBundle/Config/config.php | sed -E "s/.*'version'\s*=>\s*'([^']+)'.*/\1/")
+          if [ -z "$version" ]; then
+            echo "Could not extract version from config.php" >&2
+            exit 1
+          fi
+          echo "version=$version" >> $GITHUB_OUTPUT
+
+      - name: Get tag name
+        id: get_tag
+        run: |
+          tag=${GITHUB_REF##*/}
+          echo "tag=$tag" >> $GITHUB_OUTPUT
+
+      - name: Compare tag and config.php version
+        run: |
+          if [ "${{ steps.get_version.outputs.version }}" != "${{ steps.get_tag.outputs.tag }}" ]; then
+            echo "Tag (${{ steps.get_tag.outputs.tag }}) does not match config.php version (${{ steps.get_version.outputs.version }})"
+            exit 1
+          fi
+        shell: bash
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build artifacts
+        run: tar -czf ${{ env.RELEASE_PATH }} .
+
+
+      - name: Extract latest release notes
+        id: extract_notes
+        run: |
+          awk '/^## / && NR>1 {exit} {print}' CHANGELOG.md > LATEST_RELEASE_NOTES.md
+          echo "Latest release notes extracted:"
+          cat LATEST_RELEASE_NOTES.md
+
+      - name: Check release notes version matches tag
+        id: check_notes
+        run: |
+          changelog_version=$(awk '/^## / {print $2; exit}' CHANGELOG.md)
+          tag_name=${GITHUB_REF##*/}
+          if [ "$changelog_version" != "$tag_name" ]; then
+            echo "Latest release notes version ($changelog_version) does not match tag ($tag_name)."
+            exit 1
+          fi
+          echo "Changelog version matches tag: $tag_name"
+
+      - name: "Create release"
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: ${{ env.RELEASE_PATH }}
+          bodyFile: "LATEST_RELEASE_NOTES.md"
+          token: ${{ secrets.GITHUB_TOKEN }}
