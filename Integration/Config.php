@@ -26,7 +26,7 @@ class Config
             $integration = $this->getIntegrationEntity();
 
             return (bool) $integration->getIsPublished() ?: false;
-        } catch (IntegrationNotFoundException $e) {
+        } catch (IntegrationNotFoundException) {
             return false;
         }
     }
@@ -68,7 +68,7 @@ class Config
             $integration = $this->getIntegrationEntity();
 
             return $integration->getApiKeys() ?: [];
-        } catch (IntegrationNotFoundException $e) {
+        } catch (IntegrationNotFoundException) {
             return [];
         }
     }
@@ -82,7 +82,7 @@ class Config
             $integration = $this->getIntegrationEntity();
 
             return $integration->getFeatureSettings() ?: [];
-        } catch (IntegrationNotFoundException $e) {
+        } catch (IntegrationNotFoundException) {
             return [];
         }
     }

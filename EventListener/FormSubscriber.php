@@ -33,7 +33,10 @@ class FormSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents()
+    /**
+     * @return array<string, array<int, string|int>>
+     */
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::FORM_ON_BUILD                              => ['onFormBuild', 0],
@@ -66,7 +69,7 @@ class FormSubscriber implements EventSubscriberInterface
             'load_delay' => $this->config->getLoadDelay(),
         ]);
 
-        $event->addValidator($this::class::VALIDATOR_KEY, [
+        $event->addValidator(self::VALIDATOR_KEY, [
             'eventName' => FriendlyCaptchaEvents::ON_FORM_CUSTOM_FIELD_VALIDATION,
             'fieldType' => 'plugin.friendlycaptcha',
         ]);
