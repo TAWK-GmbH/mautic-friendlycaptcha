@@ -31,7 +31,6 @@
         "functional": "../../bin/phpunit -d memory_limit=1G  --bootstrap ../../vendor/autoload.php --configuration phpunit.xml --fail-on-warning --testsuite=functional",
         "coverage": "../../bin/phpunit -d memory_limit=1G  --bootstrap ../../vendor/autoload.php --configuration phpunit.xml --fail-on-warning --testsuite=all --coverage-text --coverage-html=Tests/Coverage",
         "csfixer": "../../bin/php-cs-fixer fix . -v --dry-run --diff --using-cache=no --config=../../.php-cs-fixer.php",
-        "fixcs": "../../bin/php-cs-fixer fix . -v --using-cache=no --config=../../.php-cs-fixer.php",
-        "phpstan": "[ ! -f ../../var/cache/test/AppKernelTestDebugContainer.xml ] && (echo 'Building test cache ...'; APP_ENV=test APP_DEBUG=1 ../../bin/console > /dev/null 2>&1); php -d memory_limit=4G ../../bin/phpstan analyse ."
+        "fixcs": "../../bin/php-cs-fixer fix . -v --using-cache=no --config=../../.php-cs-fixer.php"
     }
 }
