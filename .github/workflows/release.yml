@@ -12,29 +12,35 @@ jobs:
   validate-tag:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Extract version from config.php
         id: get_version
         run: |
-          version=$(grep "'version'" plugins/MauticFriendlyCaptchaBundle/Config/config.php | sed -E "s/.*'version'\s*=>\s*'([^']+)'.*/\1/")
+          # Extract version from config.php (e.g., 1.2.3)
+          version=$(grep "'version'" Config/config.php | sed -E "s/.*'version'\s*=>\s*'([^']+)'.*/\1/")
+          echo "[DEBUG] Extracted config.php version: $version"
           if [ -z "$version" ]; then
             echo "Could not extract version from config.php" >&2
             exit 1
           fi
           echo "version=$version" >> $GITHUB_OUTPUT
 
-      - name: Get tag name
-        id: get_tag
+      - name: Get tag version (strip leading v)
+        id: get_tag_version
         run: |
-          tag=${GITHUB_REF##*/}
-          echo "tag=$tag" >> $GITHUB_OUTPUT
+          # Use github.ref_name for the tag (e.g., v1.2.3) and strip leading 'v'
+          tag_name="${{ github.ref_name }}"
+          tag_version=${tag_name#v}
+          echo "[DEBUG] Github tag name: $tag_name"
+          echo "[DEBUG] Tag version (no v): $tag_version"
+          echo "tag_version=$tag_version" >> $GITHUB_OUTPUT
 
-      - name: Compare tag and config.php version
+      - name: Compare tag version and config.php version
         run: |
-          if [ "${{ steps.get_version.outputs.version }}" != "${{ steps.get_tag.outputs.tag }}" ]; then
-            echo "Tag (${{ steps.get_tag.outputs.tag }}) does not match config.php version (${{ steps.get_version.outputs.version }})"
+          echo "[DEBUG] Comparing config.php version: ${{ steps.get_version.outputs.version }} to tag version: ${{ steps.get_tag_version.outputs.tag_version }}"
+          if [ "${{ steps.get_version.outputs.version }}" != "${{ steps.get_tag_version.outputs.tag_version }}" ]; then
+            echo "Tag version (${{ steps.get_tag_version.outputs.tag_version }}) does not match config.php version (${{ steps.get_version.outputs.version }})"
             exit 1
           fi
         shell: bash
@@ -46,21 +52,26 @@ jobs:
       - name: Build artifacts
         run: tar -czf ${{ env.RELEASE_PATH }} .
 
-
       - name: Extract latest release notes
         id: extract_notes
         run: |
+          # Extract the latest release notes section from CHANGELOG.md
           awk '/^## / && NR>1 {exit} {print}' CHANGELOG.md > LATEST_RELEASE_NOTES.md
-          echo "Latest release notes extracted:"
+          echo "[DEBUG] Latest release notes extracted:"
           cat LATEST_RELEASE_NOTES.md
 
       - name: Check release notes version matches tag
         id: check_notes
         run: |
+          # Get the version from the latest changelog section (e.g., 1.2.3)
           changelog_version=$(awk '/^## / {print $2; exit}' CHANGELOG.md)
-          tag_name=${GITHUB_REF##*/}
-          if [ "$changelog_version" != "$tag_name" ]; then
-            echo "Latest release notes version ($changelog_version) does not match tag ($tag_name)."
+          tag_name="${{ github.ref_name }}"
+          tag_version=${tag_name#v}
+          echo "[DEBUG] Changelog version: $changelog_version"
+          echo "[DEBUG] Tag name: $tag_name"
+          echo "[DEBUG] Tag version (no v): $tag_version"
+          if [ "$changelog_version" != "$tag_version" ]; then
+            echo "Latest release notes version ($changelog_version) does not match tag version ($tag_version) from tag ($tag_name)."
             exit 1
           fi
           echo "Changelog version matches tag: $tag_name"
