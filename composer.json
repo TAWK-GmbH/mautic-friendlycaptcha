@@ -1,5 +1,5 @@
 {
-    "name": "tawk/mautic-friendlycaptcha-bundle",
+    "name": "tawk-gmbh/mautic-friendlycaptcha-bundle",
     "description": "This plugin brings Friendly Captcha integration to mautic.",
     "type": "mautic-plugin",
     "license": "GPL-3.0-only",
