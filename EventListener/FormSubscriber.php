@@ -46,6 +46,10 @@ class FormSubscriber implements EventSubscriberInterface
 
     public function onFormBuild(FormBuilderEvent $event): void
     {
+        if (!$this->config->isPublished()) {
+            return;
+        }
+    
         if (!$this->config->isConfigured()) {
             $this->logger->error('FriendlyCaptcha: Please configure site_key and secret_key.');
 
@@ -77,6 +81,10 @@ class FormSubscriber implements EventSubscriberInterface
 
     public function onFormValidateCustomField(ValidationEvent $event): void
     {
+        if (!$this->config->isPublished()) {
+            return;
+        }
+    
         if (!$this->config->isConfigured()) {
             $this->logger->error('FriendlyCaptcha: Please configure site_key and secret_key. Accept form submission anyways.');
 
