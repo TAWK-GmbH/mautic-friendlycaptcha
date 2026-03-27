@@ -50,9 +50,19 @@ class FormSubscriberTest extends TestCase
         ], $events);
     }
 
+    public function testDontBuildFormWhenNotPublished(): void
+    {
+        $this->config->method('isPublished')->willReturn(false);
+
+        $this->logger->expects($this->never())->method('error');
+
+        $this->subscriber->onFormBuild($this->formBuildEvent);
+    }
+
     public function testDontBuildFormOnConfigError(): void
     {
         $this->config->method('isConfigured')->willReturn(false);
+        $this->config->method('isPublished')->willReturn(true);
 
         $this->logger->expects($this->once())->method('error');
 
@@ -62,6 +72,8 @@ class FormSubscriberTest extends TestCase
     public function testOnFormBuild(): void
     {
         $this->config->method('isConfigured')->willReturn(true);
+        $this->config->method('isPublished')->willReturn(true);
+
         $this->config->method('getVersion')->willReturn('a');
         $this->config->method('getApiKeys')->willReturn(['site_key' => 'b']);
         $this->config->method('getEmbedType')->willReturn('legacy');
@@ -90,7 +102,9 @@ class FormSubscriberTest extends TestCase
     public function testDontValidateFormOnConfigError(): void
     {
         $this->config->method('isConfigured')->willReturn(false);
-        $this->logger->expects($this->once())->method(constraint: 'error');
+        $this->config->method('isPublished')->willReturn(true);
+
+        $this->logger->expects($this->once())->method('error');
         $this->fcClient->expects($this->never())->method('verify');
 
         $event = $this->createMock(ValidationEvent::class);
@@ -102,6 +116,7 @@ class FormSubscriberTest extends TestCase
     public function testOnFormValidateSuccess(): void
     {
         $this->config->method('isConfigured')->willReturn(true);
+        $this->config->method('isPublished')->willReturn(true);
 
         $captchaResult = 'atesttoken';
 
@@ -121,6 +136,7 @@ class FormSubscriberTest extends TestCase
     public function testOnFormValidateFailure(): void
     {
         $this->config->method('isConfigured')->willReturn(true);
+        $this->config->method('isPublished')->willReturn(true);
 
         $captchaResult = 'atesttoken';
 

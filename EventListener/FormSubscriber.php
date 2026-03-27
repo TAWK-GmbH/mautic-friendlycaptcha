@@ -49,7 +49,7 @@ class FormSubscriber implements EventSubscriberInterface
         if (!$this->config->isPublished()) {
             return;
         }
-    
+
         if (!$this->config->isConfigured()) {
             $this->logger->error('FriendlyCaptcha: Please configure site_key and secret_key.');
 
@@ -84,7 +84,7 @@ class FormSubscriber implements EventSubscriberInterface
         if (!$this->config->isPublished()) {
             return;
         }
-    
+
         if (!$this->config->isConfigured()) {
             $this->logger->error('FriendlyCaptcha: Please configure site_key and secret_key. Accept form submission anyways.');
 
