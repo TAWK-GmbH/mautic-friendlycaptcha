@@ -14,7 +14,7 @@ use MauticPlugin\MauticFriendlyCaptchaBundle\Integration\Support\ConfigSupport;
 return [
     'name'        => 'Friendly Captcha',
     'description' => 'Enables Friendly Captcha integration.',
-    'version'     => '5.4.8',
+    'version'     => '5.4.9',
     'author'      => 'Daniel Band',
     'services'    => [
         'integrations' => [
