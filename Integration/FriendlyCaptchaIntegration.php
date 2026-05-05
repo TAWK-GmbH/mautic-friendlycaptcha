@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticFriendlyCaptchaBundle\Integration;
 
 use Mautic\IntegrationsBundle\Integration\BasicIntegration;

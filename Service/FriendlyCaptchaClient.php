@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticFriendlyCaptchaBundle\Service;
 
 use GuzzleHttp\Psr7\Request;
@@ -22,15 +24,16 @@ class FriendlyCaptchaClient
             return false;
         }
 
-        $url = 'v1' == $this->config->getVersion()
-            ? 'https://api.friendlycaptcha.com/api/v1/siteverify'
-            : 'https://global.frcapi.com/api/v2/captcha/siteverify';
+      $url = $this->config->getVersion() === 'v1'
+        ? 'https://api.friendlycaptcha.com/api/v1/siteverify'
+        : 'https://global.frcapi.com/api/v2/captcha/siteverify';
 
         $headers = ['Content-Type' => 'application/json'];
 
-        $body    = 'v1' == $this->config->getVersion()
-            ? ['solution' => $solution, 'sitekey' => $this->config->getApiKeys()['site_key']]
-            : ['response' => $solution, 'sitekey' => $this->config->getApiKeys()['site_key']];
+      $siteKey = $this->config->getApiKeys()['site_key'];
+      $body    = $this->config->getVersion() === 'v1'
+        ? ['solution' => $solution, 'sitekey' => $siteKey]
+        : ['response'  => $solution, 'sitekey' => $siteKey];
 
         if ('v1' == $this->config->getVersion()) {
             $body['secret'] = $this->config->getApiKeys()['secret_key'];
@@ -43,7 +46,7 @@ class FriendlyCaptchaClient
         try {
             $response = $this->httpClient->sendRequest($request);
 
-            return $this->isValidResponse($response->getStatusCode(), $response->getBody());
+            return $this->isValidResponse($response->getStatusCode(), (string) $response->getBody());
         } catch (\Exception $e) {
             $this->logger->error('FriendlyCaptcha: Verification failed. Accept form submission anyways', ['exception' => $e]);
 
@@ -53,9 +56,11 @@ class FriendlyCaptchaClient
 
     private function isValidResponse(int $statusCode, string $body): bool
     {
-        if (200 !== $statusCode) {
-            throw new \Exception('Check if secret and solution are sent in the request body.');
-        }
+      if ($statusCode !== 200) {
+        throw new \RuntimeException(
+          sprintf('Friendly Captcha verification failed with status code %d.', $statusCode)
+        );
+      }
 
         $response = json_decode($body, true);
 
