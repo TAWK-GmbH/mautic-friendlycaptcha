@@ -8,6 +8,7 @@ use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use Mautic\IntegrationsBundle\Integration\BasicIntegration;
 use Mautic\PluginBundle\Entity\Integration;
 use MauticPlugin\MauticFriendlyCaptchaBundle\Integration\Config;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -49,6 +50,7 @@ class ConfigTest extends TestCase
      *
      * @param array<string, string> $options
      */
+    #[DataProvider('getPluginNotConfiguredDataProvider')]
     public function testPluginNotConfigured(array $options): void
     {
         $this->integration
