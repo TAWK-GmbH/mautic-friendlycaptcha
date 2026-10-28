@@ -1,6 +1,6 @@
 # Mautic Friendly Captcha Plugin
 
-This plugin integrates Friendly Captcha with Mautic 5 and 6.
+This plugin integrates Friendly Captcha with Mautic 5 - 7.
 
 Friendly Captcha is a protected trademark. All Friendly Captcha trademarks, logos and brand names are the sole property of Friendly Captcha GmbH, Germany. Use of them does not imply any affiliation with or endorsement by them.
 
@@ -30,8 +30,8 @@ Legacy is the default mode after upgrading the plugin, unless you select another
 If the Friendly Captcha SDK is not yet available in the window, the API script checks for its presence every 500ms. 
 
 **Friendly Captcha versions**
-- v1: 0.9.19
-- v2: 0.1.36
+- v1: 0.9.18
+- v2: 1.0.2
 
 The Friendly Captcha challenge scripts are integrated into this plugin to help with GDPR compliance, provided Mautic is hosted and configured appropriately. This plugin does not guarantee automatic compliance. 
 Because all scripts are loaded from your Mautic instance, you depend on the plugin maintainer and your Mautic instance provider to update the Friendly Captcha SDK to the latest version.
