@@ -50,6 +50,8 @@ class ConfigTest extends TestCase
      *
      * @param array<string, string> $options
      */
+    // PHPUnit 9 has no attribute classes, but PHPUnit 11 needs attribute metadata.
+    // @phpstan-ignore-next-line
     #[DataProvider('getPluginNotConfiguredDataProvider')]
     public function testPluginNotConfigured(array $options): void
     {
