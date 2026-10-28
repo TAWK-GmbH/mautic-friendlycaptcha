@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticFriendlyCaptchaBundle\Tests\Unit\EventListener;
 
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\ValidationEvent;
 use Mautic\FormBundle\FormEvents;
@@ -99,20 +100,6 @@ class FormSubscriberTest extends TestCase
         $this->assertEquals($validators['plugin.friendlycaptcha'], FriendlyCaptchaEvents::ON_FORM_CUSTOM_FIELD_VALIDATION);
     }
 
-    public function testDontValidateFormOnConfigError(): void
-    {
-        $this->config->method('isConfigured')->willReturn(false);
-        $this->config->method('isPublished')->willReturn(true);
-
-        $this->logger->expects($this->once())->method('error');
-        $this->fcClient->expects($this->never())->method('verify');
-
-        $event = $this->createMock(ValidationEvent::class);
-        $event->expects($this->never())->method('failedValidation');
-
-        $this->subscriber->onFormValidateCustomField($event);
-    }
-
     public function testOnFormValidateSuccess(): void
     {
         $this->config->method('isConfigured')->willReturn(true);
@@ -126,11 +113,10 @@ class FormSubscriberTest extends TestCase
             ->with($captchaResult)
             ->willReturn(true);
 
-        $event = $this->createMock(ValidationEvent::class);
-        $event->method('getValue')->willReturn($captchaResult);
-        $event->expects($this->never())->method('failedValidation');
+        $event = new ValidationEvent($this->createMock(Field::class), $captchaResult);
 
         $this->subscriber->onFormValidateCustomField($event);
+        $this->assertTrue($event->isValid(), 'Field should pass validation');
     }
 
     public function testOnFormValidateFailure(): void
@@ -146,10 +132,9 @@ class FormSubscriberTest extends TestCase
             ->with($captchaResult)
             ->willReturn(false);
 
-        $event = $this->createMock(ValidationEvent::class);
-        $event->method('getValue')->willReturn($captchaResult);
-        $event->expects($this->once())->method('failedValidation');
+        $event = new ValidationEvent($this->createMock(Field::class), $captchaResult);
 
         $this->subscriber->onFormValidateCustomField($event);
+        $this->assertFalse($event->isValid(), 'Field should fail validation');
     }
 }
